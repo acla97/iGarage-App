@@ -311,6 +311,52 @@ input[type=search]{-webkit-appearance:none}
 #tyrerow .frow::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
 #tyrerow+.frow::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
 .group>.frow+#tyrerow .frow::before{display:block}
+
+/* tab Home centrale */
+.tab.home{overflow:visible}
+.tab.home .hb{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;margin-top:-22px;box-shadow:0 6px 16px rgba(0,0,0,.35),0 0 0 4px var(--bg);transition:transform .2s,box-shadow .2s}
+.tab.home .hb svg{width:28px;height:28px;stroke:currentColor;stroke-width:1.9}
+.tab.home.on .hb{transform:scale(1.06);box-shadow:0 8px 20px rgba(0,0,0,.4),0 0 0 4px var(--bg),0 0 0 6px var(--blue)}
+.tab.home.on span:last-child{color:var(--blue)}
+/* riquadri home */
+.group-title .lnk,.group-title .who{font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--blue)}
+.group-title .who{color:var(--label2)}
+.vrow{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 10px;margin:0 -16px;padding-left:16px;padding-right:16px;scroll-snap-type:x mandatory;scrollbar-width:none}
+.vrow::-webkit-scrollbar{display:none}
+.vcard{flex:0 0 76%;max-width:290px;min-height:132px;border-radius:20px;padding:14px;color:#fff;text-align:left;position:relative;overflow:hidden;scroll-snap-align:start;background:linear-gradient(135deg,var(--blue),#5e5ce6);display:flex;flex-direction:column;gap:2px}
+.vcard.cur{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--label3)}
+.vcard .vart{position:absolute;right:10px;top:12px;width:96px;color:#fff;opacity:.95}
+.vcard .vart svg{display:block;width:100%;height:auto}
+.vcard .vn{font-size:16px;font-weight:700;max-width:60%;line-height:1.2}
+.vcard .vk{font-size:26px;font-weight:700;margin-top:auto;font-variant-numeric:tabular-nums}
+.vcard .vs{font-size:12px;opacity:.9;display:flex;align-items:center;gap:6px}
+.vcard .vs .d{width:9px;height:9px;border-radius:50%;display:inline-block;border:1.5px solid rgba(255,255,255,.7)}
+.vcard .d.l0{background:#30d158}.vcard .d.l1{background:#ffd60a}.vcard .d.l2{background:#ff453a}
+.vcard.lt,.vcard.lt *{color:#1c1c1e}
+.vcard.lt .vart{color:#2c2c30}
+.vcard.add{background:var(--bg2);color:var(--blue);align-items:center;justify-content:center;border:1.5px dashed var(--sep);flex:0 0 40%;gap:6px;font-weight:600;font-size:14px}
+.vcard.add .plus{font-size:28px;line-height:1}
+.tipcard{display:flex;gap:14px;align-items:flex-start;background:var(--bg2);border-radius:16px;padding:14px 16px}
+.tipcard .te{font-size:26px;line-height:1.1}
+.tipcard p{margin:0;font-size:15px;line-height:1.4;color:var(--label)}
+.card{background:var(--bg2);border-radius:16px;padding:16px;width:100%;text-align:left;display:block;color:var(--label)}
+.cc-top{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+.donut.sm{width:112px;height:112px;margin:0;flex:none}
+.donut.sm .dh{width:74px;height:74px}
+.donut.sm .dh b{font-size:14px}.donut.sm .dh span{font-size:10px}
+.leg{list-style:none;margin:0;padding:0;flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.leg li{display:flex;align-items:center;gap:7px;font-size:13px}
+.leg li i{width:9px;height:9px;border-radius:50%;flex:none}
+.leg li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--label2)}
+.leg li b{font-variant-numeric:tabular-nums;font-weight:600}
+.leg li.ytd{margin-top:4px;padding-top:6px;border-top:.5px solid var(--sep)}
+.costcard .mb{height:96px;padding:14px 0 0}
+.costcard .mcol em{display:none}
+.mv{width:36px;height:36px;font-size:18px;color:var(--blue)}
+.mv:disabled{opacity:.25}
+.row>.chk{margin-right:12px;padding:0}
+.vrow{scroll-padding-left:16px}
+.tab.home .hb{margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -567,6 +613,7 @@ const ICON = {
   scooter: '<svg viewBox="0 0 24 24"><circle cx="5.6" cy="17.2" r="2.7"/><circle cx="18.4" cy="17.2" r="2.7"/><path d="M18.4 17.2L16.2 6.6h-2.1M14.6 6.6h3.4M8.3 17.2h4.4c1.2 0 2-.8 2-1.9v-1.5H9.4c-1.3 0-2.2-.9-2.4-2L6.6 9.4H4.2"/></svg>',
   doc: '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4M9.8 12h5.4M9.8 15.5h5.4"/></svg>',
   search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+  home: '<svg viewBox="0 0 24 24"><path d="M3.8 11.2L12 4.4l8.2 6.8"/><path d="M6 9.8v9.7h12V9.8"/><path d="M10 19.5v-5h4v5"/></svg>',
   plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
 };
 const BRANDS = {
@@ -630,16 +677,17 @@ const frow = (label, id, html) => `<label class="frow" for="${id}"><span>${label
 const inp = (id, val, ph = '', extra = '') => `<input id="${id}" value="${esc(val ?? '')}" placeholder="${esc(ph)}" autocomplete="off" ${extra}>`;
 const typeIco = t => `<div class="ico" style="background:${t.c}">${t.e}</div>`;
 
-function remRow(x, car) {
+function remRow(x, car, withCar) {
   const t = typeOf(x.r.type), s = x.s;
   return `<button class="row two icon tap" data-a="editReminder" data-id="${x.r.id}">${typeIco(t)}
-    <div class="t"><div class="a">${esc(x.r.title || t.n)}</div><div class="b">${esc(s.sub)}</div></div>
+    <div class="t"><div class="a">${esc(x.r.title || t.n)}</div><div class="b">${esc((withCar ? carName(car) + ' · ' : '') + s.sub)}</div></div>
     <span class="badge l${s.level}">${esc(s.badge)}</span>${CHEV}</button>`;
 }
-function svcRow(s) {
+function svcRow(s, withCar) {
   const t = typeOf(s.type);
   const main = s.title || t.n;
-  const sub = [s.title ? t.n : null, fmtDate(s.date), s.km ? fmtKm(s.km) : null, s.shop].filter(Boolean).join(' · ');
+  const cr = withCar ? db.cars.find(c => c.id === s.carId) : null;
+  const sub = [s.title ? t.n : null, fmtDate(s.date), s.km ? fmtKm(s.km) : null, s.shop, cr ? carName(cr) : null].filter(Boolean).join(' · ');
   return `<button class="row two icon tap" data-a="editService" data-id="${s.id}">${typeIco(t)}
     <div class="t"><div class="a">${esc(main)}</div><div class="b">${esc(sub)}</div></div>
     ${(s.photoIds || []).length ? '<span class="v">📎</span>' : ''}
@@ -695,10 +743,7 @@ function vAuto() {
   const recent = db.services.filter(s => s.carId === car.id).sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 3);
   let banners = '';
   const hasData = db.services.length > 0;
-  const lb = db.settings.lastBackup;
-  if (hasData && (!lb || daysBetween(lb.slice(0, 10), today()) > 45)) {
-    banners += `<div class="banner"><div class="bi">💾</div><div><b>Fai un backup</b>I dati sono solo su questo iPhone. Salvane una copia in File o iCloud.<br><button class="lk" data-a="export">Crea backup</button></div></div>`;
-  }
+  banners += backupBanner();
   if (isIOS() && !isStandalone() && !db.settings.hideInstall) {
     banners += `<div class="banner"><div class="bi">📲</div><div><b>Usala come un'app</b>Tocca Condividi e poi «Aggiungi alla schermata Home».</div><button class="x" data-a="hideInstall">✕</button></div>`;
   }
@@ -714,6 +759,14 @@ function vAuto() {
       archiveGroup(car) +
       banners,
   };
+}
+function backupBanner() {
+  const lb = db.settings.lastBackup, sn = db.settings.backupSnooze;
+  if (!db.services.length && !db.docs.length) return '';
+  const days = lb ? daysBetween(lb.slice(0, 10), today()) : null;
+  if (lb && days <= 30) return '';
+  if (sn && sn >= today()) return '';
+  return `<div class="banner"><div class="bi">💾</div><div><b>${lb ? 'Backup di un mese fa' : 'Fai il primo backup'}</b>${lb ? `L'ultimo risale a ${days} giorni fa. ` : ''}I dati sono solo su questo iPhone: salvane una copia in File o iCloud.<br><button class="lk" data-a="export">Crea backup</button> · <button class="lk" data-a="snoozeBackup">Più tardi</button></div></div>`;
 }
 function archiveGroup(car) {
   const nd = docCount(car), nf = db.fines.filter(f => f.carId === car.id && !f.paid).length;
@@ -798,24 +851,28 @@ function vRem() {
   return { title: 'Scadenze', right: `<button data-a="addReminder" aria-label="Aggiungi">${ICON.plus}</button>`, body };
 }
 
-function monthBars(car) {
-  const sv = db.services.filter(s => s.carId === car.id && s.cost > 0);
+function monthBarsInner(sv) {
   const now = new Date(), ms = [];
   for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); ms.push({ k: d.getFullYear() + '-' + pad(d.getMonth() + 1), l: 'GFMAMGLASOND'[d.getMonth()], v: 0 }); }
   sv.forEach(s => { const m = ms.find(x => x.k === s.date.slice(0, 7)); if (m) m.v += s.cost; });
   const max = Math.max(...ms.map(m => m.v));
-  if (!max) return `<div class="group"><div class="row"><div class="t"><div class="b">Nessuna spesa negli ultimi 12 mesi.</div></div></div></div>`;
-  return `<div class="group mbars"><div class="mb">${ms.map(m => `<div class="mcol"><em>${m.v === max ? nfEur0.format(m.v) : ''}</em><i style="height:${m.v ? Math.max(4, Math.round(m.v / max * 100)) : 0}%"></i><span>${m.l}</span></div>`).join('')}</div></div>`;
+  if (!max) return '';
+  return `<div class="mb">${ms.map(m => `<div class="mcol"><em>${m.v === max ? nfEur0.format(m.v) : ''}</em><i style="height:${m.v ? Math.max(4, Math.round(m.v / max * 100)) : 0}%"></i><span>${m.l}</span></div>`).join('')}</div>`;
+}
+function monthBars(car) {
+  const inner = monthBarsInner(db.services.filter(s => s.carId === car.id && s.cost > 0));
+  return inner ? `<div class="group mbars">${inner}</div>` : `<div class="group"><div class="row"><div class="t"><div class="b">Nessuna spesa negli ultimi 12 mesi.</div></div></div></div>`;
 }
 function vCosts() {
   const car = curCar();
   const c = costStats(car);
-  if (!c.count) return { title: 'Costi', body: `<div class="empty"><div class="big">📊</div><h2>Ancora nessun costo</h2><p>Quando inserisci un intervento con il costo, qui vedrai quanto spendi.</p><button class="btn" data-a="addService">Aggiungi intervento</button></div>` };
+  if (!c.count) return { title: 'Costi', left: BACKH, body: `<div class="empty"><div class="big">📊</div><h2>Ancora nessun costo</h2><p>Quando inserisci un intervento con il costo, qui vedrai quanto spendi.</p><button class="btn" data-a="addService">Aggiungi intervento</button></div>` };
   const cats = Object.entries(c.byCat).sort((a, b) => b[1] - a[1]);
   const years = Object.entries(c.byYear).sort((a, b) => b[0].localeCompare(a[0]));
   const maxY = Math.max(...years.map(y => y[1]));
   return {
     title: 'Costi',
+    left: BACKH,
     body: `<div class="stats">
       <div class="stat"><div class="n">${nfEur0.format(c.total)}</div><div class="l">Totale speso</div></div>
       <div class="stat"><div class="n">${nfEur0.format(c.thisYear)}</div><div class="l">Quest'anno</div></div>
@@ -852,7 +909,7 @@ function vMore() {
     <div class="group-foot">I dati restano solo su questo iPhone. Se cancelli l'app o i dati di Safari li perdi: ogni tanto esporta un backup e salvalo in File o iCloud.</div>
     <div class="group-title">Zona pericolosa</div>
     <div class="group"><button class="row tap red" data-a="wipe">Cancella tutti i dati</button></div>
-    <div class="group-foot" style="text-align:center;margin-top:24px">iGarage · versione 1.5</div>`,
+    <div class="group-foot" style="text-align:center;margin-top:24px">iGarage · versione 1.6</div>`,
   };
 }
 
@@ -870,7 +927,97 @@ function applyTheme() {
 if (darkMQ && darkMQ.addEventListener) darkMQ.addEventListener('change', applyTheme);
 
 /* ================= render ================= */
-const TABS = [['auto', 'Auto'], ['interventi', 'Interventi'], ['scadenze', 'Scadenze'], ['costi', 'Costi'], ['altro', 'Altro']];
+/* ================= home ================= */
+const HW = { vehicles: 'I tuoi veicoli', tip: 'Consiglio del giorno', fines: 'Multe da pagare', next: 'Prossime scadenze', costs: 'Spese', recent: 'Ultimi interventi', quick: 'Azioni rapide' };
+const HW_DEFAULT = ['vehicles', 'tip', 'fines', 'next', 'costs', 'recent', 'quick'];
+function homeCfg() {
+  const saved = Array.isArray(db.settings.home) ? db.settings.home.filter(w => HW[w.k]) : HW_DEFAULT.map(k => ({ k, on: true }));
+  Object.keys(HW).forEach(k => { if (!saved.some(w => w.k === k)) saved.push({ k, on: true }); });
+  return saved;
+}
+const doy = () => { const n = new Date(); return Math.floor((n - new Date(n.getFullYear(), 0, 0)) / 864e5); };
+function tipOfDay() {
+  const m = new Date().getMonth() + 1, car = curCar(), pool = [];
+  if (m >= 10 || m <= 3) pool.push({ e: '❄️', t: 'Dal 15 novembre al 15 aprile, sulle strade con il cartello, servono gomme invernali o le catene a bordo.' }, { e: '🌡️', t: 'Sotto i 7 °C le gomme estive perdono aderenza: se non le cambi, guida con più distanza di sicurezza.' }, { e: '🔋', t: 'Il freddo mette alla prova la batteria: se parte con fatica, fai controllare la carica prima di restare a piedi.' });
+  if (m >= 3 && m <= 5) pool.push({ e: '🌸', t: 'In primavera controlla il liquido lavavetri e le spazzole dei tergicristalli: dopo l\'inverno sono spesso da cambiare.' });
+  if (m >= 6 && m <= 8) pool.push({ e: '🧳', t: 'Prima di un viaggio lungo controlla pressione delle gomme, olio e liquido refrigerante. Trovi la lista nei Controlli.' }, { e: '☀️', t: 'D\'estate controlla il climatizzatore e il livello del liquido di raffreddamento prima delle giornate più calde.' });
+  if (car && car.year && new Date().getFullYear() - car.year >= 4) pool.push({ e: '🔋', t: 'La batteria ha più di 4 anni: fai controllare l\'efficienza al prossimo tagliando.' });
+  if (car && car.km) { const next = (Math.floor(car.km / 10000) + 1) * 10000; if (next - car.km <= 1500) pool.push({ e: '🎯', t: `Mancano circa ${nfInt.format(next - car.km)} km ai ${nfInt.format(next)} km: un buon momento per un controllo generale.` }); }
+  pool.push(
+    { e: '🛞', t: 'Controlla la pressione delle gomme una volta al mese, a freddo. Una pressione giusta riduce consumi e usura.' },
+    { e: '🛢️', t: 'Il livello dell\'olio si controlla a motore spento e auto in piano. Se scende spesso, fallo vedere in officina.' },
+    { e: '⛽', t: 'Non girare spesso in riserva: la pompa del carburante si raffredda con il carburante e si consuma prima.' },
+    { e: '💡', t: 'Controlla luci, frecce e stop ogni tanto: puoi farlo tu, con un muro o la vetrina di un negozio.' },
+    { e: '🧾', t: 'Fotografa lo scontrino dei lavori: ti servono per la garanzia e valgono quando vendi l\'auto.' },
+    { e: '🧼', t: 'Lava anche il sottoscocca dopo l\'inverno: il sale sulle strade favorisce la ruggine.' },
+    { e: '🔧', t: 'Il tagliando regolare è la spesa che ne evita altre: rispetta sia i km sia i mesi, vale il primo che arriva.' });
+  return pool[doy() % pool.length];
+}
+function wVehicles() {
+  const cards = db.cars.map(c => {
+    const lk = heroLook(c), it = carRems(c).filter(x => x.s.level >= 0), ok = it.filter(x => x.s.level === 0).length, worst = it.reduce((m, x) => Math.max(m, x.s.level), 0);
+    return `<button class="vcard ${lk.cls} ${c.id === curCar().id ? 'cur' : ''}" style="${lk.style}" data-a="pickCarId" data-id="${c.id}">
+      <span class="vart">${vehicleArt(bodyOf(c))}</span>
+      <span class="vn">${esc(carName(c))}</span>
+      <span class="vk">${nfInt.format(c.km || 0)} km</span>
+      <span class="vs"><i class="d l${worst}"></i>${it.length ? ok + '/' + it.length + ' in regola' : 'Nessuna scadenza'}</span>
+    </button>`;
+  }).join('');
+  return `<div class="group-title">${HW.vehicles}</div><div class="vrow">${cards}<button class="vcard add" data-a="addCar"><span class="plus">＋</span><span>Aggiungi veicolo</span></button></div>`;
+}
+function wTip() { const t = tipOfDay(); return `<div class="group-title">${HW.tip}</div><div class="tipcard"><span class="te">${t.e}</span><p>${esc(t.t)}</p></div>`; }
+function wFines() {
+  const fl = db.fines.filter(f => !f.paid && f.due && daysBetween(today(), f.due) <= 30).sort((a, b) => a.due.localeCompare(b.due));
+  return fl.length ? `<div class="group-title">${HW.fines}</div><div class="group">${fl.map(fineRow).join('')}</div>` : '';
+}
+function wNext() {
+  const multi = db.cars.length > 1;
+  const all = db.cars.flatMap(car => carRems(car).filter(x => x.s.level >= 0).map(x => ({ x, car }))).sort((a, b) => b.x.s.level - a.x.s.level || (a.x.s.dueDate || '9999').localeCompare(b.x.s.dueDate || '9999')).slice(0, 4);
+  if (!all.length) return `<div class="group-title">${HW.next}</div><div class="group"><button class="row two icon tap" data-a="goto" data-t="scadenze"><div class="ico" style="background:var(--green)">✓</div><div class="t"><div class="a">Nessuna scadenza impostata</div><div class="b">Aggiungi tagliando, bollo, assicurazione…</div></div>${CHEV}</button></div>`;
+  return `<div class="group-title"><span>${HW.next}</span><button class="lnk" data-a="goto" data-t="scadenze">Vedi tutte</button></div><div class="group">${all.map(({ x, car }) => remRow(x, car, multi)).join('')}</div>`;
+}
+function wCosts() {
+  const now = new Date(), start = toISO(new Date(now.getFullYear(), now.getMonth() - 11, 1));
+  const list = db.services.filter(s => s.cost > 0 && s.date >= start), total = list.reduce((a, s) => a + s.cost, 0);
+  const ytd = db.services.filter(s => s.cost > 0 && s.date.startsWith(String(now.getFullYear()))).reduce((a, s) => a + s.cost, 0);
+  if (!total) return `<div class="group-title">${HW.costs}</div><div class="group"><button class="row two icon tap" data-a="goto" data-t="costi"><div class="ico" style="background:var(--blue)">📊</div><div class="t"><div class="a">Nessuna spesa negli ultimi 12 mesi</div><div class="b">Inserisci il costo negli interventi per vedere i grafici</div></div>${CHEV}</button></div>`;
+  const byCat = {}; list.forEach(s => { byCat[s.type] = (byCat[s.type] || 0) + s.cost; });
+  const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+  let acc = 0; const grad = cats.map(([k, v]) => { const s = acc / total * 100; acc += v; return `${typeOf(k).c} ${s}% ${acc / total * 100}%`; }).join(',');
+  return `<div class="group-title"><span>${HW.costs}</span><button class="lnk" data-a="goto" data-t="costi">Dettagli</button></div>
+  <button class="card costcard" data-a="goto" data-t="costi">
+    <div class="cc-top"><div class="donut sm" style="background:conic-gradient(${grad})"><div class="dh"><b>${nfEur0.format(total)}</b><span>12 mesi</span></div></div>
+    <ul class="leg">${cats.slice(0, 4).map(([k, v]) => `<li><i style="background:${typeOf(k).c}"></i><span>${esc(typeOf(k).n)}</span><b>${nfEur0.format(v)}</b></li>`).join('')}<li class="ytd"><span>Quest'anno</span><b>${nfEur0.format(ytd)}</b></li></ul></div>
+    ${monthBarsInner(list)}
+  </button>`;
+}
+function wRecent() {
+  const multi = db.cars.length > 1;
+  const l = db.services.slice().sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 3);
+  return l.length ? `<div class="group-title"><span>${HW.recent}</span><button class="lnk" data-a="tab" data-t="interventi">Vedi tutti</button></div><div class="group">${l.map(s => svcRow(s, multi)).join('')}</div>` : '';
+}
+function wQuick() {
+  const car = curCar();
+  return `<div class="group-title"><span>${HW.quick}</span><span class="who">${esc(carName(car))}</span></div>
+  <div class="two-btn"><button class="btn gray" data-a="addService">＋ Intervento</button><button class="btn gray" data-a="addReminder">＋ Scadenza</button></div>
+  <div class="two-btn" style="margin-top:10px"><button class="btn gray" data-a="park">${car.park ? '📍 Dov\'è' : '🅿️ Parcheggio'}</button><button class="btn gray" data-a="checks">✅ Controlli</button></div>`;
+}
+function vHome() {
+  const W = { vehicles: wVehicles, tip: wTip, fines: wFines, next: wNext, costs: wCosts, recent: wRecent, quick: wQuick };
+  return { title: 'Home', right: `<button class="lnk" data-a="homeEdit">Modifica</button>`, body: backupBanner() + homeCfg().filter(w => w.on).map(w => W[w.k]()).join('') };
+}
+function homeSheet() {
+  const cfg = homeCfg();
+  openSheet({
+    title: 'Personalizza Home', noSave: true,
+    body: `<div class="group-foot" style="margin:4px 4px 12px">Scegli quali riquadri vedere e in che ordine.</div>
+    <div class="group">${cfg.map((w, i) => `<div class="row"><button class="chk ${w.on ? 'on' : ''}" data-a="homeToggle" data-k="${w.k}" aria-label="Mostra o nascondi">✓</button><span class="t"><span class="a">${HW[w.k]}</span></span>
+      <button class="mv" data-a="homeMove" data-k="${w.k}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Sposta su">↑</button><button class="mv" data-a="homeMove" data-k="${w.k}" data-d="1" ${i === cfg.length - 1 ? 'disabled' : ''} aria-label="Sposta giù">↓</button></div>`).join('')}</div>
+    <button class="btn gray" data-a="homeReset">Ripristina l'ordine iniziale</button>`,
+  });
+}
+
+const TABS = [['auto', 'Auto'], ['interventi', 'Interventi'], ['home', 'Home'], ['scadenze', 'Scadenze'], ['altro', 'Altro']];
 function render(keep = true) {
   applyTheme();
   const sc = $('#screen'), nav = $('#nav');
@@ -878,13 +1025,18 @@ function render(keep = true) {
   const welcome = !db.cars.length && S.tab !== 'altro';
   let v;
   if (welcome) v = { welcome: true, body: vWelcome() };
-  else v = { auto: vAuto, interventi: vServ, scadenze: vRem, costi: vCosts, altro: vMore, docs: vDocs, contatti: vContacts, multe: vFines, assic: vAssic, cerca: vSearch }[S.tab]();
+  else v = { home: vHome, auto: vAuto, interventi: vServ, scadenze: vRem, costi: vCosts, altro: vMore, docs: vDocs, contatti: vContacts, multe: vFines, assic: vAssic, cerca: vSearch }[S.tab]();
   sc.innerHTML = (v.welcome ? '' : `<h1 class="large">${esc(v.title)}</h1>`) + v.body;
   nav.innerHTML = v.welcome ? '' : `<div class="slot l">${v.left || ''}</div><div class="small">${esc(v.title)}</div><div class="slot r">${v.right || ''}</div>`;
   sc.scrollTop = top;
   nav.classList.toggle('solid', top > 38);
   const n = alertCount();
-  $('#tabbar').innerHTML = TABS.map(([k, l]) => `<button class="tab ${S.tab === k || (['docs', 'contatti', 'multe', 'assic', 'cerca'].includes(S.tab) && k === 'auto') ? 'on' : ''}" data-a="tab" data-t="${k}">${ICON[k === 'auto' && curCar() && kindOf(curCar()) === 'scooter' ? 'scooter' : k]}<span>${l}</span>${k === 'scadenze' && n ? `<b class="dot">${n}</b>` : ''}</button>`).join('');
+  const car0 = curCar(), hl = car0 ? heroLook(car0) : { style: '', cls: '' };
+  const hbg = car0 && car0.color ? rgb(shade(car0.color, 0)) : 'var(--blue)', hfg = hl.cls === 'lt' ? '#1c1c1e' : '#fff';
+  const isOn = k => S.tab === k || (k === 'auto' && ['docs', 'contatti', 'multe', 'assic', 'cerca'].includes(S.tab)) || (k === 'home' && S.tab === 'costi');
+  $('#tabbar').innerHTML = TABS.map(([k, l]) => k === 'home'
+    ? `<button class="tab home ${isOn(k) ? 'on' : ''}" data-a="tab" data-t="home" aria-label="Home"><span class="hb" style="background:${hbg};color:${hfg}">${ICON.home}</span><span>${l}</span></button>`
+    : `<button class="tab ${isOn(k) ? 'on' : ''}" data-a="tab" data-t="${k}">${ICON[k === 'auto' && curCar() && kindOf(curCar()) === 'scooter' ? 'scooter' : k]}<span>${l}</span>${k === 'scadenze' && n ? `<b class="dot">${n}</b>` : ''}</button>`).join('');
   hydrate(document);
   if (S.tab === 'cerca') bindSearch();
   const kc = $('.kmn[data-count]');
@@ -1097,6 +1249,7 @@ function serviceSheet(id, pre = {}) {
 }
 
 /* ================= contatti, multe, assicurazione, ricerca, calendario ================= */
+const BACKH = '<button class="lnk" data-a="tab" data-t="home">‹ Home</button>';
 const BACK = '<button class="lnk" data-a="tab" data-t="auto">‹ Indietro</button>';
 const ROLES = [['assistenza', 'Assistenza stradale', '🚨', '#ff453a'], ['assicurazione', 'Compagnia assicurativa', '🛡️', '#5e5ce6'], ['officina', 'Officina', '🔧', '#0a84ff'], ['carrozzeria', 'Carrozzeria', '🚘', '#ff6482'], ['gommista', 'Gommista', '🛞', '#8e8e93'], ['altro', 'Altro', '📞', '#30d158']];
 const ROLE = Object.fromEntries(ROLES.map(r => [r[0], { n: r[1], e: r[2], c: r[3] }]));
@@ -1306,6 +1459,8 @@ function buildICS() {
     if (e.desc) L.push(...icsFold('DESCRIPTION:' + icsEsc(e.desc)));
     L.push('TRANSP:TRANSPARENT', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:iGarage', 'TRIGGER:-P6DT15H', 'END:VALARM', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:iGarage', 'TRIGGER:-PT15H', 'END:VALARM', 'END:VEVENT');
   }
+  const nm = new Date(); const bd = toISO(new Date(nm.getFullYear(), nm.getMonth() + 1, 1));
+  L.push('BEGIN:VEVENT', 'UID:backup@igarage.app', `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d8(bd)}`, `DTEND;VALUE=DATE:${d8(addDays(bd, 1))}`, 'RRULE:FREQ=MONTHLY', 'SUMMARY:Backup di iGarage', ...icsFold('DESCRIPTION:' + icsEsc('Apri iGarage, vai su Altro e tocca Esporta backup.')), 'TRANSP:TRANSPARENT', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:iGarage', 'TRIGGER:PT9H', 'END:VALARM', 'END:VEVENT');
   L.push('END:VCALENDAR');
   return L.join('\r\n') + '\r\n';
 }
@@ -1608,6 +1763,11 @@ const A = {
     const tr = $('#tyrerow', o), tf = $('#tyrefoot', o); if (tr) tr.hidden = SK === 'scooter'; if (tf) tf.hidden = SK === 'scooter';
     const f = $('#fuel', o); if (f) { const cur = f.value; f.innerHTML = '<option value="">—</option>' + fuelsFor(SK).map(x => `<option ${x === cur ? 'selected' : ''}>${x}</option>`).join(''); }
   },
+  homeEdit() { homeSheet(); },
+  homeToggle(d) { const c = homeCfg(); const w = c.find(x => x.k === d.k); w.on = !w.on; db.settings.home = c; save(); render(); homeSheet(); },
+  homeMove(d) { const c = homeCfg(), i = c.findIndex(x => x.k === d.k), n = i + (+d.d); if (n < 0 || n >= c.length) return; [c[i], c[n]] = [c[n], c[i]]; db.settings.home = c; save(); render(); homeSheet(); },
+  homeReset() { db.settings.home = null; save(); render(); homeSheet(); },
+  snoozeBackup() { db.settings.backupSnooze = addDays(today(), 7); save(); render(); toast('Te lo ricordo tra una settimana'); },
   hideMs() { const c = curCar(); if (c) { delete c.msNew; save(); render(); } },
   pickCarId(d) { const i0 = db.cars.findIndex(c => c.id === curCar().id), i1 = db.cars.findIndex(c => c.id === d.id); S.slide = i1 > i0 ? 'r' : i1 < i0 ? 'l' : null; db.settings.carId = d.id; S.tab = 'auto'; save(); render(false); },
   addContact(d) { contactSheet(null, d.role); },
@@ -1653,7 +1813,7 @@ const A = {
   delCar(d) { confirmAct('Eliminare il veicolo con tutti i suoi interventi, scadenze e documenti?', 'Elimina veicolo', async () => { deleteCar(d.id); closeSheet(true); await save(); render(); toast('Auto eliminata'); }); },
   wipe() { confirmAct('Cancellare tutti i dati? L\'operazione non si può annullare.', 'Cancella tutto', async () => { try { await phClear(); } catch (e) {} phCache.clear(); db = emptyDB(); await save(); S.tab = 'auto'; render(false); toast('Dati cancellati'); }); },
   filter(d) { S.filter = d.f; render(); },
-  async demo() { db = demoData(); await save(); S.tab = 'auto'; render(false); toast('Dati di esempio caricati'); },
+  async demo() { db = demoData(); await save(); S.tab = 'home'; render(false); toast('Dati di esempio caricati'); },
   setTheme(d) { db.settings.theme = d.v; save(); render(); },
   hideInstall() { db.settings.hideInstall = true; save(); render(); },
   export() { exportBackup(); },
@@ -1693,6 +1853,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden && !s
 (async () => {
   await load();
   S.intro = true;
+  S.tab = db.cars.length ? 'home' : 'auto';
   render(false);
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     const reg = () => navigator.serviceWorker.register('sw.js').catch(() => {});
