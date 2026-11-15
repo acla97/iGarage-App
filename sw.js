@@ -3,7 +3,7 @@
 //   se la rete manca o è lenta (>3 s) si usa la copia salvata: l'app funziona offline.
 // - Icone e manifest: dalla cache, aggiornati in background.
 // Se cambi i file in modo importante, incrementa CACHE (es. v2).
-const CACHE = 'garage-v8';
+const CACHE = 'garage-v7';
 const ASSETS = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
