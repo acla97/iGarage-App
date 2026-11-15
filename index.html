@@ -1,0 +1,1705 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>iGarage</title>
+<meta name="description" content="iGarage: manutenzione, scadenze e spese di auto e scooter">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#000000">
+<script>(function(){try{var p=localStorage.getItem("garage-theme")||"auto";var d=p==="dark"||(p==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-skin",d?"dark":"light")}catch(e){document.documentElement.setAttribute("data-skin","dark")}})()</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="iGarage">
+<meta name="format-detection" content="telephone=no">
+<style>
+/* Garage – stile iOS scuro, minimal */
+:root{
+  color-scheme:dark;
+  --bg:#000;--bg2:#1c1c1e;--bg3:#2c2c2e;--bg4:#3a3a3c;
+  --label:#fff;--label2:rgba(235,235,245,.6);--label3:rgba(235,235,245,.3);
+  --sep:rgba(84,84,88,.65);
+  --blue:#0a84ff;--green:#30d158;--orange:#ff9f0a;--red:#ff453a;--yellow:#ffd60a;--indigo:#5e5ce6;--teal:#64d2ff;
+  --gt:#30d158;--ot:#ff9f0a;--rt:#ff453a;
+  --bar:rgba(28,28,30,.8);--sheet:#1c1c1e;--sheetg:#2c2c2e;--sheetp:#3a3a3c;--asbox:rgba(44,44,46,.97);--toast:rgba(58,58,60,.96);
+  --xbg:#000;--xbd:#636366;--segon:#636366;--backdrop:rgba(0,0,0,.45);
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+}
+:root[data-skin=light]{
+  color-scheme:light;
+  --bg:#f2f2f7;--bg2:#fff;--bg3:#e9e9ee;--bg4:#d1d1d6;
+  --label:#000;--label2:rgba(60,60,67,.62);--label3:rgba(60,60,67,.3);
+  --sep:rgba(60,60,67,.22);
+  --blue:#007aff;--green:#34c759;--orange:#ff9500;--red:#ff3b30;--yellow:#ffcc00;--indigo:#5856d6;--teal:#32ade6;
+  --gt:#1e8e3e;--ot:#b25e00;--rt:#d70015;
+  --bar:rgba(249,249,249,.86);--sheet:#f2f2f7;--sheetg:#fff;--sheetp:#e5e5ea;--asbox:rgba(255,255,255,.96);--toast:rgba(40,40,42,.92);
+  --xbg:#fff;--xbd:#c7c7cc;--segon:#fff;--backdrop:rgba(0,0,0,.3);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--label);
+  font:17px/1.3 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none;-webkit-touch-callout:none;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation}
+body{position:fixed;inset:0;overflow:hidden}
+input,textarea{-webkit-user-select:text;user-select:text}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+#app{position:relative;height:100%;max-width:560px;margin:0 auto;overflow:hidden}
+
+/* barra in alto */
+.nav{position:absolute;top:0;left:0;right:0;z-index:5;height:calc(44px + var(--sat));padding:var(--sat) 16px 0;
+  display:flex;align-items:center;justify-content:space-between;transition:background .2s,box-shadow .2s}
+.nav.solid{background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:0 .5px 0 var(--sep)}
+.nav .small{position:absolute;left:70px;right:70px;bottom:0;height:44px;line-height:44px;text-align:center;font-weight:600;
+  opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav.solid .small{opacity:1}
+.nav .slot{min-width:44px;display:flex;align-items:center;position:relative;z-index:1}
+.nav .slot.r{justify-content:flex-end}
+.nav .lnk{color:var(--blue);font-size:17px;padding:10px 0}
+.nav svg{width:26px;height:26px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round}
+
+#screen{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:calc(var(--sat) + 44px) 16px calc(92px + var(--sab))}
+h1.large{font-size:34px;line-height:1.1;font-weight:700;letter-spacing:.37px;margin:6px 0 18px}
+
+/* barra delle schede */
+#tabbar{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;padding:7px 6px calc(7px + var(--sab));
+  background:var(--bar);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);box-shadow:0 -.5px 0 var(--sep)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:500;color:#8e8e93;position:relative}
+.tab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--blue)}
+.tab .dot{position:absolute;top:-2px;left:calc(50% + 6px);min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;
+  font-size:11px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+
+/* gruppi e righe */
+.group-title{display:flex;justify-content:space-between;font-size:13px;text-transform:uppercase;color:var(--label2);margin:24px 16px 7px;letter-spacing:-.08px}
+.group-title.first{margin-top:0}
+.group-foot{font-size:13px;color:var(--label2);margin:8px 16px 0}
+.group{background:var(--bg2);border-radius:12px;overflow:hidden}
+.row{display:flex;align-items:center;min-height:44px;padding:0 16px;position:relative;gap:12px;width:100%;text-align:left}
+.row.two{padding-top:9px;padding-bottom:9px;min-height:56px}
+.row+.row::before,.frow+.frow::before,.group>.thumbs:not(:empty)+.row::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.row.icon+.row::before{left:58px}
+.tap:active{background:var(--bg3)}
+.row .t{flex:1;min-width:0}
+.row .a{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .b{font-size:13px;color:var(--label2);margin-top:1px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.row .v{color:var(--label2);flex:none}
+.row.red,.row.red .a{color:var(--red)}
+.row.blue,.row.blue .a{color:var(--blue)}
+.ico{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;font-size:17px;flex:none}
+.chev{width:8px;height:14px;flex:none;stroke:var(--label3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.badge{flex:none;font-size:14px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(48,209,88,.16);color:var(--gt)}
+.badge.l1{background:rgba(255,159,10,.18);color:var(--ot)}
+.badge.l2{background:rgba(255,69,58,.18);color:var(--rt)}
+.badge.l-1{background:rgba(142,142,147,.2);color:#aeaeb2}
+.amount{flex:none;font-weight:500}
+
+/* scheda auto */
+.hero{border-radius:22px;padding:20px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--blue) 0%,#5e5ce6 100%);box-shadow:0 10px 30px rgba(10,132,255,.25)}
+.hero::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative;z-index:1}
+.hero .cn{font-size:22px;font-weight:700;margin-top:10px;letter-spacing:.2px}
+.hero .cs{font-size:14px;opacity:.85;margin-top:2px}
+.hero .avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.6);background:rgba(255,255,255,.2);flex:none}
+.hero .kmrow{display:flex;align-items:baseline;gap:6px;margin-top:18px;position:relative;z-index:1}
+.hero .kmn{font-size:42px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.hero .kmu{font-size:17px;opacity:.85}
+.hero .kms{font-size:13px;opacity:.85;position:relative;z-index:1}
+.hero .hbtn{margin-top:14px;padding:8px 16px;border-radius:99px;background:rgba(255,255,255,.22);font-weight:600;font-size:15px;position:relative;z-index:1}
+.hero .hbtn:active{background:rgba(255,255,255,.35)}
+.plate{display:inline-flex;align-items:stretch;background:#fff;color:#111;border-radius:6px;overflow:hidden;border:1.5px solid #1b1b1b;font-weight:700}
+.plate i{background:#0b3d9b;color:#ffd60a;font-style:normal;font-size:10px;width:18px;display:grid;place-items:center}
+.plate b{padding:3px 10px;font-size:19px;letter-spacing:2px;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+
+.two-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 0}
+.btn{display:block;width:100%;padding:14px;border-radius:12px;background:var(--blue);color:#fff;font-weight:600;font-size:17px;text-align:center}
+.btn:active{opacity:.8}
+.btn.gray{background:var(--bg2);color:var(--blue)}
+.btn.gray:active{background:var(--bg3)}
+.btn.sp{margin-top:14px}
+
+.status{display:flex;align-items:center;gap:12px;background:var(--bg2);border-radius:14px;padding:14px 16px;margin-top:12px;width:100%;text-align:left}
+.status .si{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;font-weight:700;flex:none}
+.status.ok .si{background:rgba(48,209,88,.18);color:var(--gt)}
+.status.l1 .si{background:rgba(255,159,10,.2);color:var(--ot)}
+.status.l2 .si{background:rgba(255,69,58,.2);color:var(--rt)}
+.status.l0 .si{background:rgba(142,142,147,.2);color:#aeaeb2}
+.status .a{font-weight:600}
+.status .b{font-size:13px;color:var(--label2)}
+.banner{display:flex;gap:12px;align-items:flex-start;background:var(--bg2);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:15px}
+.banner .bi{font-size:22px;line-height:1}
+.banner b{display:block;margin-bottom:2px}
+.banner .x{margin-left:auto;color:var(--label3);font-size:18px;padding:0 0 0 8px}
+.banner .lk{color:var(--blue);font-weight:600;margin-top:6px;display:inline-block}
+
+/* filtri */
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 6px;padding:0 16px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 14px;border-radius:99px;background:var(--bg2);font-size:15px;color:var(--label2);font-weight:500}
+.chip.on{background:var(--blue);color:#fff}
+
+/* statistiche */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--bg2);border-radius:14px;padding:14px}
+.stat .n{font-size:24px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums}
+.stat .l{font-size:13px;color:var(--label2);margin-top:2px}
+.bars{padding:6px 16px 14px}
+.brow{padding:9px 0 0}
+.brow .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.brow .top>span:first-child{display:flex;align-items:center;gap:8px}
+.brow .top>span:last-child{white-space:nowrap;flex:none}
+.bar{height:8px;border-radius:4px;background:var(--bg3);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px}
+.muted{color:var(--label2)}
+
+.empty{text-align:center;color:var(--label2);padding:44px 28px}
+.empty .big{font-size:56px;margin-bottom:8px}
+.empty h2{color:var(--label);font-size:20px;margin:0 0 6px}
+.empty p{margin:0 0 18px;font-size:15px}
+.welcome{min-height:100%;display:flex;flex-direction:column;justify-content:center;padding:20px 0}
+.welcome .logo{width:96px;height:96px;border-radius:22px;margin:0 auto 18px;display:block;box-shadow:0 10px 30px rgba(10,132,255,.3)}
+.welcome h1{font-size:34px;text-align:center;margin:0 0 8px}
+.welcome p{color:var(--label2);text-align:center;margin:0 0 24px}
+.feat{display:flex;gap:14px;align-items:center;margin:0 4px 16px}
+.feat .ico{width:42px;height:42px;border-radius:10px;font-size:22px}
+.feat b{display:block}.feat span{font-size:14px;color:var(--label2)}
+.linkbtn{display:block;margin:16px auto 0;color:var(--blue);font-size:15px}
+
+/* schede a comparsa (form) */
+#overlay{position:absolute;inset:0;z-index:20;pointer-events:none}
+#overlay.open{pointer-events:auto}
+.backdrop{position:absolute;inset:0;background:var(--backdrop);opacity:0;transition:opacity .28s}
+.open>.backdrop{opacity:1}
+.sheet{position:absolute;left:0;right:0;bottom:0;top:calc(var(--sat) + 12px);background:var(--sheet);border-radius:14px 14px 0 0;
+  transform:translateY(102%);transition:transform .34s cubic-bezier(.2,.85,.25,1);display:flex;flex-direction:column;overflow:hidden}
+.open>.sheet{transform:none}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;height:54px;padding:0 16px;flex:none;position:relative}
+.sheet-head .ttl{font-weight:600;position:absolute;left:90px;right:90px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet-head .lnk{color:var(--blue);font-size:17px;padding:10px 0;position:relative;z-index:1}
+.sheet-head .lnk.b{font-weight:600}
+.sheet-body{overflow-y:auto;flex:1;padding:0 16px calc(32px + var(--sab));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.sheet .group{background:var(--sheetg)}
+.sheet .tap:active{background:var(--sheetp)}
+.sheet .group-title:first-child{margin-top:4px}
+.frow{display:flex;align-items:center;min-height:46px;padding:0 16px;position:relative;gap:12px}
+.frow>span{flex:none}
+.frow input,.frow select,.frow textarea{flex:1;min-width:0;background:none;border:0;color:var(--label);font:inherit;text-align:right;outline:none;
+  padding:12px 0;-webkit-appearance:none;appearance:none;border-radius:0}
+.frow select{text-align-last:right;color:var(--label)}
+.frow input::placeholder,.frow textarea::placeholder{color:var(--label3)}
+.frow input[type=date]{min-height:34px;padding:6px 0;text-align:right}
+.frow.col{display:block;padding:0 16px}
+.frow.col textarea{width:100%;text-align:left;resize:none;display:block;padding:12px 0}
+.sheet .btn{margin-top:18px}
+.thumbs{display:flex;flex-wrap:wrap;gap:10px;padding:12px 16px 4px}
+.thumbs:empty{display:none}
+.thumb{position:relative;width:76px;height:76px}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:10px;background:var(--bg3);display:block}
+.thumb .x{position:absolute;top:-7px;right:-7px;width:24px;height:24px;border-radius:50%;background:var(--xbg);border:1.5px solid var(--xbd);color:var(--label);font-size:12px;display:grid;place-items:center}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.photos img{width:64px;height:64px;object-fit:cover;border-radius:8px;background:var(--bg3)}
+
+/* action sheet */
+#as{position:absolute;inset:0;z-index:30;pointer-events:none}
+#as.open{pointer-events:auto}
+.as{position:absolute;left:8px;right:8px;bottom:calc(8px + var(--sab));transform:translateY(120%);transition:transform .3s cubic-bezier(.2,.85,.25,1)}
+#as.open .as{transform:none}
+.as .box{background:var(--asbox);border-radius:14px;overflow:hidden;margin-top:8px}
+.as .box>div,.as .box>button{display:block;width:100%;padding:17px 16px;font-size:20px;text-align:center;color:var(--blue)}
+.as .box>button+button,.as .box>div+button{border-top:.5px solid var(--sep)}
+.as .as-t{font-size:13px;color:var(--label2);padding:14px 16px;border-bottom:.5px solid var(--sep)}
+.as .box>button:active{background:var(--sheetp)}
+.as .danger{color:var(--red)}
+.as .cancel{font-weight:600}
+
+/* visualizzatore foto */
+#viewer{position:absolute;inset:0;z-index:40;background:#000;display:none;align-items:center;justify-content:center}
+#viewer.open{display:flex}
+#viewer img{max-width:100%;max-height:100%;object-fit:contain}
+#viewer .close{position:absolute;top:calc(var(--sat) + 10px);right:14px;width:36px;height:36px;border-radius:50%;background:rgba(60,60,67,.8);color:#fff;font-size:18px;display:grid;place-items:center}
+
+#toast{position:absolute;left:50%;bottom:calc(96px + var(--sab));transform:translate(-50%,20px);z-index:50;color:#fff;background:var(--toast);padding:11px 18px;border-radius:99px;
+  font-size:15px;opacity:0;pointer-events:none;transition:.25s;max-width:88%;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* selettore a segmenti (tema) */
+.seg{display:flex;gap:2px;background:var(--bg3);border-radius:9px;padding:2px;margin:10px 14px}
+.seg button{flex:1;padding:8px 4px;border-radius:7px;font-size:14px;font-weight:500;color:var(--label);transition:background .15s}
+.seg button.on{background:var(--segon);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.sheet .seg{background:var(--bg4)}
+.hero,.hero *{color:#fff}
+.plate,.plate *{color:#111}
+.plate i{color:#ffd60a}
+
+.hero .sym{flex:none;display:block}
+.nav .slot.l .lnk{white-space:nowrap}
+
+a.btn{text-decoration:none}
+.sheet .btn.gray{background:var(--bg3);color:var(--blue)}
+.chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--sep);flex:none;display:grid;place-items:center;color:transparent;font-size:14px;font-weight:700;margin-right:12px;transition:background .15s,border-color .15s}
+.chk.on{background:var(--green);border-color:var(--green);color:#fff}
+.x2{padding:6px 4px 6px 12px;color:var(--red);font-size:16px}
+.sheet .group+.group{margin-top:14px}
+
+.nav .slot.r{gap:18px}
+input[type=search]{-webkit-appearance:none}
+#q{text-align:left;flex:1;min-width:0;margin-left:10px}
+.group+#sres .group-title.first{margin-top:22px}
+
+/* carta veicolo */
+.hero{min-height:236px}
+.hero .hl{flex:1;min-width:0}
+.hero .heroart{position:relative;flex:none;width:118px;margin-top:4px;color:#fff}
+.hero .vart{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}
+.hero .heroart .bb{position:absolute;left:-8px;top:-10px;width:30px;height:30px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff}
+.hero .ring{position:absolute;right:20px;bottom:36px;width:58px;height:58px;z-index:1}
+.hero .ring svg{width:100%;height:100%;display:block}
+.hero .ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.hero .ring .d{position:absolute;right:-2px;top:-2px;width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.25)}
+.hero .ring .d.l0{background:#30d158}.hero .ring .d.l1{background:#ffd60a}.hero .ring .d.l2{background:#ff453a}
+.hero .ringcap{position:absolute;right:14px;bottom:18px;width:70px;text-align:center;font-size:11px;opacity:.85;z-index:1}
+.hero.lt{color:#1c1c1e}
+.hero.lt,.hero.lt *{color:#1c1c1e}
+.hero.lt .hbtn{background:rgba(0,0,0,.09)}
+.hero.lt .heroart{color:#2c2c30}
+.hero.lt .heroart .bb{border-color:#fff;color:#fff}
+.hero.lt::after{background:rgba(255,255,255,.35)}
+.plate,.plate *{color:#111!important}
+.dots{display:flex;justify-content:center;gap:8px;margin:12px 0 0}
+.dots button{width:8px;height:8px;border-radius:50%;background:var(--sep);padding:0;transition:transform .2s,background .2s}
+.dots button.on{background:var(--label);transform:scale(1.25)}
+.slide-r{animation:slr .32s ease-out}.slide-l{animation:sll .32s ease-out}
+@keyframes slr{from{transform:translateX(34px);opacity:.2}to{transform:none;opacity:1}}
+@keyframes sll{from{transform:translateX(-34px);opacity:.2}to{transform:none;opacity:1}}
+/* colori */
+.swatches{display:flex;flex-wrap:wrap;gap:12px;padding:14px}
+.sw{width:34px;height:34px;border-radius:50%;background:var(--c);border:2px solid var(--sep);padding:0;position:relative}
+.sw.on{outline:3px solid var(--blue);outline-offset:2px}
+.sw.auto{background:linear-gradient(135deg,var(--blue),#5e5ce6);color:#fff;font-weight:700;font-size:14px;border:0}
+/* costi */
+.donutg{padding:18px 0}
+.donut{width:164px;height:164px;border-radius:50%;margin:0 auto;display:grid;place-items:center}
+.donut .dh{width:108px;height:108px;border-radius:50%;background:var(--bg2);display:grid;place-content:center;text-align:center;gap:2px}
+.donut .dh b{font-size:20px;font-variant-numeric:tabular-nums}.donut .dh span{font-size:12px;color:var(--label2)}
+.mb{display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end;height:130px;padding:12px 14px 10px}
+.mcol{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
+.mcol i{display:block;width:100%;background:var(--blue);border-radius:4px 4px 2px 2px;min-height:0}
+.mcol span{font-size:10px;color:var(--label2)}
+.mcol em{font-style:normal;position:absolute;top:-4px;font-size:10px;font-weight:600;white-space:nowrap;transform:translateY(-100%);color:var(--label)}
+.mbars{overflow:visible;padding-top:16px}
+/* animazioni */
+.chk.pop{animation:chkpop .28s ease-out}
+@keyframes chkpop{0%{transform:scale(.6)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+.banner.ms{position:relative;overflow:hidden}
+.confetti{position:absolute;inset:0;pointer-events:none}
+.confetti i{position:absolute;top:-10px;left:var(--x);width:6px;height:10px;border-radius:1px;background:var(--c);animation:fall 1.7s var(--d) ease-in forwards}
+@keyframes fall{to{transform:translateY(120px) rotate(420deg);opacity:0}}
+#splash{position:fixed;inset:0;z-index:99;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s;pointer-events:none;animation:splashout .01s 2.2s forwards}
+#splash.out{opacity:0}
+#splash img{width:96px;height:96px;border-radius:22px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#splash b{font-size:24px;letter-spacing:.2px;color:var(--label)}
+@keyframes splashout{to{opacity:0;visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.slide-r,.slide-l,.chk.pop,.confetti i{animation:none}.confetti{display:none}}
+.hero .kms{padding-right:84px}
+.donutg{margin-top:12px}
+#tyrerow .frow::before,#tyrerow+.frow::before,#tyrerow{position:relative}
+#tyrerow .frow::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+#tyrerow+.frow::before{content:"";position:absolute;top:0;left:16px;right:0;height:.5px;background:var(--sep)}
+.group>.frow+#tyrerow .frow::before{display:block}
+</style>
+</head>
+<body>
+<div id="splash"><img src="apple-touch-icon.png" alt=""><b>iGarage</b></div>
+<div id="app">
+  <div id="nav" class="nav"></div>
+  <main id="screen"></main>
+  <nav id="tabbar"></nav>
+  <div id="overlay"></div>
+  <div id="as"></div>
+  <div id="viewer"></div>
+  <div id="toast"></div>
+</div>
+<script>
+/* iGarage – manutenzione auto e scooter. Tutti i dati restano sul dispositivo (IndexedDB). */
+(() => {
+'use strict';
+
+/* ================= utilità ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const nfInt = new Intl.NumberFormat('it-IT', { maximumFractionDigits: 0, useGrouping: 'always' });
+const nfEur = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', useGrouping: 'always' });
+const nfEur0 = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0, useGrouping: 'always' });
+const cap = s => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const pad = n => String(n).padStart(2, '0');
+const toISO = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const today = () => toISO(new Date());
+const ymd = s => { const [y, m, d] = s.split('-').map(Number); return [y, m - 1, d]; };
+const daysBetween = (a, b) => Math.round((Date.UTC(...ymd(b)) - Date.UTC(...ymd(a))) / 864e5);
+const addDays = (s, n) => { const [y, m, d] = ymd(s); return toISO(new Date(y, m, d + n)); };
+const addMonths = (s, n) => {
+  const [y, m, d] = ymd(s);
+  const t = new Date(y, m + n, 1);
+  const last = new Date(t.getFullYear(), t.getMonth() + 1, 0).getDate();
+  t.setDate(Math.min(d, last));
+  return toISO(t);
+};
+const fmtDate = s => { const [y, m, d] = ymd(s); return new Date(y, m, d).toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' }); };
+const fmtKm = n => nfInt.format(Math.round(n || 0)) + ' km';
+function relDays(n) {
+  if (n === 0) return 'oggi';
+  const a = Math.abs(n);
+  if (a === 1) return n > 0 ? 'domani' : 'ieri';
+  const txt = a <= 60 ? `${a} giorni` : a < 730 ? `${Math.round(a / 30.4)} mesi` : `${(a / 365).toFixed(1).replace('.', ',')} anni`;
+  return n > 0 ? `tra ${txt}` : `${txt} fa`;
+}
+function parseNum(s) {
+  s = String(s ?? '').replace(/[\s €]/g, '');
+  if (!s) return null;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, ''); // 84.600 = 84600 (punto delle migliaia)
+  const v = parseFloat(s);
+  return isNaN(v) ? null : v;
+}
+const isStandalone = () => navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+/* ================= tipi di intervento ================= */
+const TYPES = [
+  { k: 'tagliando', n: 'Tagliando', e: '🔧', c: '#0a84ff', km: 15000, mesi: 12 },
+  { k: 'olio', n: 'Cambio olio', e: '🛢️', c: '#ff9f0a', km: 15000, mesi: 12 },
+  { k: 'gomme', n: 'Gomme', e: '🛞', c: '#8e8e93', mesi: 6 },
+  { k: 'freni', n: 'Freni', e: '🛑', c: '#ff453a' },
+  { k: 'batteria', n: 'Batteria', e: '🔋', c: '#30d158', mesi: 48 },
+  { k: 'distribuzione', n: 'Distribuzione', e: '⚙️', c: '#bf5af2', km: 120000, mesi: 60 },
+  { k: 'revisione', n: 'Revisione', e: '📋', c: '#64d2ff', mesi: 24, fixed: true },
+  { k: 'bollo', n: 'Bollo', e: '🧾', c: '#ffd60a', mesi: 12, fixed: true },
+  { k: 'assicurazione', n: 'Assicurazione', e: '🛡️', c: '#5e5ce6', mesi: 12, fixed: true },
+  { k: 'gomme_inv', n: 'Gomme invernali', e: '❄️', c: '#64d2ff', mesi: 12, season: [10, 15] },
+  { k: 'gomme_est', n: 'Gomme estive', e: '☀️', c: '#ff9f0a', mesi: 12, season: [3, 15] },
+  { k: 'patente', n: 'Rinnovo patente', e: '🪪', c: '#5ac8fa', mesi: 120, fixed: true },
+  { k: 'gpl', n: 'Collaudo bombola', e: '🔥', c: '#ff6b35', mesi: 120, fixed: true },
+  { k: 'variatore', n: 'Variatore e rulli', e: '⚙️', c: '#af52de', km: 12000 },
+  { k: 'carrozzeria', n: 'Carrozzeria', e: '🚘', c: '#ff6482' },
+  { k: 'altro', n: 'Altro', e: '🧰', c: '#8e8e93' },
+];
+const TYPE = Object.fromEntries(TYPES.map(t => [t.k, t]));
+const typeOf = k => TYPE[k] || TYPE.altro;
+const FUELS = ['Benzina', 'Diesel', 'GPL', 'Metano', 'Ibrida', 'Elettrica'];
+const nextSeason = t => { const [m, d] = t.season; const y = new Date().getFullYear(); let s = toISO(new Date(y, m, d)); if (s < today()) s = toISO(new Date(y + 1, m, d)); return s; };
+const TYRES = [['seasonal', 'Estive e invernali'], ['allseason', '4 stagioni'], ['summer', 'Solo estive'], ['winter', 'Solo invernali']];
+function syncTyres(car) {
+  const has = t => db.reminders.some(r => r.carId === car.id && r.type === t);
+  if (car.tyres === 'seasonal') {
+    for (const k of ['gomme_inv', 'gomme_est']) if (!has(k)) { const t = TYPE[k]; db.reminders.push({ id: uid(), carId: car.id, type: k, title: t.n, everyKm: null, everyMonths: 12, baseDate: null, baseKm: null, dueDate: nextSeason(t) }); }
+  } else if (car.tyres) {
+    db.reminders = db.reminders.filter(r => !(r.carId === car.id && (r.type === 'gomme_inv' || r.type === 'gomme_est')));
+  }
+}
+function quickFor(car) {
+  if (car.kind === 'scooter') return ['tagliando', 'revisione', 'bollo', 'assicurazione', 'gomme', 'variatore', 'patente'];
+  const q = ['tagliando', 'revisione', 'bollo', 'assicurazione', ...(car.tyres && car.tyres !== 'seasonal' ? [] : ['gomme_inv', 'gomme_est']), 'distribuzione', 'patente'];
+  if (car.fuel === 'GPL' || car.fuel === 'Metano') q.push('gpl');
+  return q;
+}
+const KIND = { auto: { n: 'Auto', pl: 'auto' }, scooter: { n: 'Scooter', pl: 'scooter' } };
+const kindOf = c => (c && c.kind === 'scooter' ? 'scooter' : 'auto');
+const DOCT = [
+  { k: 'libretto', n: 'Libretto di circolazione', e: '📘', c: '#0a84ff' },
+  { k: 'assicurazione', n: 'Assicurazione', e: '🛡️', c: '#5e5ce6' },
+  { k: 'patente', n: 'Patente', e: '🪪', c: '#5ac8fa' },
+  { k: 'bollo', n: 'Ricevuta bollo', e: '🧾', c: '#ffd60a' },
+  { k: 'revisione', n: 'Revisione', e: '📋', c: '#64d2ff' },
+  { k: 'acquisto', n: 'Acquisto e contratti', e: '🖋️', c: '#30d158' },
+  { k: 'altro', n: 'Altro documento', e: '📄', c: '#8e8e93' },
+];
+const DOC = Object.fromEntries(DOCT.map(t => [t.k, t]));
+
+/* ================= archivio (IndexedDB) ================= */
+let dbp = null;
+const getIDB = () => dbp || (dbp = new Promise((res, rej) => {
+  const r = indexedDB.open('garage-auto', 1);
+  r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('photos'); };
+  r.onsuccess = () => res(r.result);
+  r.onerror = () => rej(r.error);
+}));
+async function tx(store, mode, fn) {
+  const d = await getIDB();
+  return new Promise((res, rej) => {
+    const t = d.transaction(store, mode);
+    const r = fn(t.objectStore(store));
+    t.oncomplete = () => res(r && r.result);
+    t.onerror = () => rej(t.error);
+    t.onabort = () => rej(t.error);
+  });
+}
+const kvGet = k => tx('kv', 'readonly', s => s.get(k));
+const kvSet = (k, v) => tx('kv', 'readwrite', s => s.put(v, k));
+const phGet = id => tx('photos', 'readonly', s => s.get(id));
+const phPut = (id, v) => tx('photos', 'readwrite', s => s.put(v, id));
+const phDel = id => tx('photos', 'readwrite', s => s.delete(id)).catch(() => {});
+const phKeys = () => tx('photos', 'readonly', s => s.getAllKeys());
+const phClear = () => tx('photos', 'readwrite', s => s.clear());
+
+function normDB() { ['docs', 'contacts', 'fines', 'quotes'].forEach(k => { if (!Array.isArray(db[k])) db[k] = []; }); if (!db.checks) db.checks = {}; }
+const allPhotoIds = () => new Set([...db.services, ...db.docs, ...db.fines].flatMap(s => s.photoIds || []).concat(db.cars.map(c => c.photoId).filter(Boolean)));
+const emptyDB = () => ({ v: 1, cars: [], services: [], reminders: [], docs: [], contacts: [], fines: [], quotes: [], checks: {}, settings: { carId: null, lastBackup: null, hideInstall: false, theme: 'auto', accent: 'blue' } });
+let db = emptyDB();
+let storageOK = true;
+const phCache = new Map();
+async function photoURL(id) {
+  if (phCache.has(id)) return phCache.get(id);
+  try { const v = await phGet(id); if (v) phCache.set(id, v); return v; } catch (e) { return null; }
+}
+async function save() {
+  try { await kvSet('data', db); storageOK = true; }
+  catch (e) { storageOK = false; toast('Salvataggio non riuscito'); }
+}
+async function load() {
+  try {
+    const d = await kvGet('data');
+    if (d && Array.isArray(d.cars)) { db = Object.assign(emptyDB(), d); normDB(); db.settings = Object.assign(emptyDB().settings, d.settings || {}); }
+    // pulizia foto non più usate
+    const used = allPhotoIds();
+    for (const id of await phKeys()) if (!used.has(id)) phDel(id);
+  } catch (e) { storageOK = false; }
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+}
+
+/* ================= calcoli ================= */
+const curCar = () => db.cars.find(c => c.id === db.settings.carId) || db.cars[0] || null;
+const carName = c => [c.make, c.model].filter(Boolean).join(' ') || c.plate || 'Auto';
+const fmtPlate = p => (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(p) ? `${p.slice(0, 2)} ${p.slice(2, 5)} ${p.slice(5)}` : p);
+const sortedLog = c => (c.kmLog || []).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+function logKm(car, date, km) {
+  car.kmLog = (car.kmLog || []).filter(e => e.date !== date);
+  car.kmLog.push({ date, km });
+  if (!car.kmDate || date >= car.kmDate) { const a = Math.floor((car.km || 0) / 10000), b2 = Math.floor(km / 10000); if (car.km != null && b2 > a && b2 > 0) car.msNew = b2 * 10000; }
+  if (!car.kmDate || date >= car.kmDate) { car.km = km; car.kmDate = date; }
+}
+function kmRate(car) {
+  const l = sortedLog(car);
+  if (l.length < 2) return null;
+  const a = l[0], b = l[l.length - 1];
+  const d = daysBetween(a.date, b.date);
+  if (d < 30) return null;
+  const r = (b.km - a.km) / d;
+  return r > 0 && r < 1500 ? r : null;
+}
+function estKm(car) {
+  const r = kmRate(car);
+  if (!r || !car.kmDate) return car.km || 0;
+  return Math.round((car.km || 0) + Math.max(0, daysBetween(car.kmDate, today())) * r);
+}
+const SOON_DAYS = 30, SOON_KM = 1000, DEF_RATE = 30;
+function remStatus(r, car) {
+  const dueDate = r.dueDate || (r.everyMonths && r.baseDate ? addMonths(r.baseDate, r.everyMonths) : null);
+  const dueKm = r.everyKm && r.baseKm != null ? r.baseKm + r.everyKm : null;
+  if (!dueDate && dueKm == null) return { level: -1, eq: Infinity, badge: 'Da impostare', sub: 'Imposta ultimo intervento o scadenza' };
+  const days = dueDate ? daysBetween(today(), dueDate) : null;
+  const kmLeft = dueKm != null ? dueKm - estKm(car) : null;
+  const rate = kmRate(car) || DEF_RATE;
+  let level = 0;
+  if ((days != null && days < 0) || (kmLeft != null && kmLeft < 0)) level = 2;
+  else if ((days != null && days <= SOON_DAYS) || (kmLeft != null && kmLeft <= SOON_KM)) level = 1;
+  const dk = kmLeft != null ? kmLeft / rate : null;
+  const eq = Math.min(days ?? Infinity, dk ?? Infinity);
+  const parts = [];
+  if (days != null) parts.push(days < 0 ? `scaduta ${relDays(days)}` : `scade ${relDays(days)}`);
+  if (kmLeft != null) parts.push(kmLeft < 0 ? `superati di ${nfInt.format(-kmLeft)} km` : `mancano ${nfInt.format(kmLeft)} km`);
+  let badge;
+  if (level === 2) badge = 'Scaduto';
+  else if (days != null && (dk == null || days <= dk)) badge = days <= 60 ? `${days} g` : `${Math.round(days / 30.4)} mesi`;
+  else badge = `${nfInt.format(kmLeft)} km`;
+  return { level, days, kmLeft, dueDate, dueKm, eq, badge, sub: cap(parts.join(' · ')) };
+}
+const cmpRem = (a, b) => (b.s.level - a.s.level) || (a.s.eq - b.s.eq);
+const carRems = car => db.reminders.filter(r => r.carId === car.id).map(r => ({ r, s: remStatus(r, car) })).sort(cmpRem);
+function alertCount() {
+  let n = 0;
+  for (const car of db.cars) for (const x of carRems(car)) if (x.s.level >= 1) n++;
+  n += db.fines.filter(f => !f.paid && f.due && daysBetween(today(), f.due) <= 30).length;
+  return n;
+}
+function advanceReminder(r, s, car, force) {
+  const km = s.km ?? car.km;
+  if (km != null && (r.baseKm == null || !r.baseDate || s.date >= r.baseDate)) r.baseKm = km;
+  if (r.dueDate && r.everyMonths) {
+    if (force || s.date >= addDays(r.dueDate, -120)) {
+      let d = r.dueDate, i = 0;
+      do { d = addMonths(d, r.everyMonths); i++; } while (d <= s.date && i < 60);
+      r.dueDate = d;
+    }
+    r.baseDate = s.date;
+  } else {
+    if (!r.baseDate || s.date >= r.baseDate) r.baseDate = s.date;
+    if (r.dueDate && !r.everyMonths) r.dueDate = null;
+  }
+}
+function costStats(car) {
+  const sv = db.services.filter(s => s.carId === car.id && s.cost > 0);
+  const total = sv.reduce((a, s) => a + s.cost, 0);
+  const y = String(new Date().getFullYear());
+  const from12 = addMonths(today(), -12);
+  const thisYear = sv.filter(s => s.date.startsWith(y)).reduce((a, s) => a + s.cost, 0);
+  const last12 = sv.filter(s => s.date >= from12).reduce((a, s) => a + s.cost, 0);
+  const byCat = {}, byYear = {};
+  sv.forEach(s => { byCat[s.type] = (byCat[s.type] || 0) + s.cost; const yy = s.date.slice(0, 4); byYear[yy] = (byYear[yy] || 0) + s.cost; });
+  const kms = [...(car.kmLog || []).map(e => e.km), ...db.services.filter(s => s.carId === car.id && s.km).map(s => s.km)];
+  const range = kms.length ? Math.max(...kms) - Math.min(...kms) : 0;
+  return { total, thisYear, last12, byCat, byYear, perKm: range >= 100 && total > 0 ? total / range : null, count: sv.length };
+}
+
+/* ================= interfaccia: pezzi riutilizzabili ================= */
+const S = { tab: 'auto', filter: 'tutti', intro: false, slide: null };
+const ICON = {
+  auto: '<svg viewBox="0 0 24 24"><path d="M4.5 15.5l1.4-4.6A2.2 2.2 0 018 9.3h8a2.2 2.2 0 012.1 1.6l1.4 4.6"/><rect x="3" y="15.5" width="18" height="4.2" rx="1.6"/><path d="M6.5 19.7v1.3M17.5 19.7v1.3"/><circle cx="7.6" cy="17.6" r=".5"/><circle cx="16.4" cy="17.6" r=".5"/></svg>',
+  interventi: '<svg viewBox="0 0 24 24"><path d="M14.8 6.2a4 4 0 00-5.3 5L3.6 17.1a1.8 1.8 0 002.5 2.5l5.9-5.9a4 4 0 005-5.3l-2.5 2.5-2.2-.6-.6-2.2z"/></svg>',
+  scadenze: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.6"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  costi: '<svg viewBox="0 0 24 24"><path d="M5 20V11M12 20V4M19 20v-6"/></svg>',
+  altro: '<svg viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18.5" cy="12" r="1.5"/></svg>',
+  scooter: '<svg viewBox="0 0 24 24"><circle cx="5.6" cy="17.2" r="2.7"/><circle cx="18.4" cy="17.2" r="2.7"/><path d="M18.4 17.2L16.2 6.6h-2.1M14.6 6.6h3.4M8.3 17.2h4.4c1.2 0 2-.8 2-1.9v-1.5H9.4c-1.3 0-2.2-.9-2.4-2L6.6 9.4H4.2"/></svg>',
+  doc: '<svg viewBox="0 0 24 24"><path d="M7 3.5h7l4 4v13H7z"/><path d="M14 3.5v4h4M9.8 12h5.4M9.8 15.5h5.4"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+};
+const BRANDS = {
+  fiat: '#a6192e', alfa: '#8c1d2f', 'alfa romeo': '#8c1d2f', lancia: '#2a3f6d', ferrari: '#d40000', maserati: '#0c2c6b', abarth: '#d4141c',
+  ford: '#1c4f9c', opel: '#e8a400', volkswagen: '#1b3f7a', vw: '#1b3f7a', audi: '#b3202a', bmw: '#1c69d4', mercedes: '#3b3f45', 'mercedes-benz': '#3b3f45',
+  toyota: '#c8102e', honda: '#c8102e', nissan: '#a4143b', mazda: '#3f4a5a', suzuki: '#1a4d9c', mitsubishi: '#d6001c', subaru: '#0b3f8f',
+  renault: '#d9a400', peugeot: '#1e3f73', citroen: '#c0262d', citroën: '#c0262d', ds: '#3b3f45', dacia: '#27499d', skoda: '#2e8b57', seat: '#a63a2c', cupra: '#a76a3c',
+  volvo: '#2b4a6f', jeep: '#3d5a3a', tesla: '#cc0000', kia: '#05141f', hyundai: '#002c5f', mini: '#1c1c1c', smart: '#1f7a4d', land: '#1f5a3a', 'land rover': '#1f5a3a',
+  porsche: '#8b1e1e', lexus: '#4a4f57', mg: '#c8102e', byd: '#2a5db0', lamborghini: '#c79a00',
+  piaggio: '#1d4f91', vespa: '#2e8b8b', aprilia: '#c4161c', yamaha: '#1b3f9c', sym: '#d9262c', kymco: '#1f6fb5', ducati: '#c8102e', 'moto guzzi': '#7a1f1f',
+  benelli: '#b8232f', malaguti: '#c4161c', italjet: '#c0262d', gilera: '#c4161c', kawasaki: '#3b8a1e', ktm: '#e87500', triumph: '#222', 'royal enfield': '#6a1f1f',
+};
+const brandKey = m => String(m || '').trim().toLowerCase().replace(/\s+/g, ' ');
+const brandColor = m => { const k = brandKey(m); return BRANDS[k] || BRANDS[k.split(' ')[0]] || '#5b6b8c'; };
+const monogram = m => {
+  const w = String(m || '').trim().split(/\s+/).filter(Boolean);
+  if (!w.length) return '·';
+  return (w.length > 1 ? w[0][0] + w[1][0] : w[0].slice(0, w[0].length <= 3 ? w[0].length : 1)).toUpperCase();
+};
+// Simbolo: stemma colorato con le iniziali della marca + sagoma del veicolo accanto
+function symbol(c, size = 58) {
+  const col = brandColor(c.make), mono = monogram(c.make), k = kindOf(c);
+  const fs = mono.length > 2 ? 11 : mono.length === 2 ? 17 : 22;
+  const glyph = ICON[k].replace('<svg viewBox="0 0 24 24">', '<svg viewBox="0 0 24 24" x="52" y="13" width="32" height="32" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">');
+  return `<svg class="sym" viewBox="0 0 92 58" width="${Math.round(size * 92 / 58)}" height="${size}" role="img" aria-label="${esc(c.make || KIND[k].n)}"><rect x="0" y="0" width="92" height="58" rx="29" fill="rgba(255,255,255,.2)"/><circle cx="29" cy="29" r="25" fill="${col}" stroke="#fff" stroke-width="2.5"/><text x="29" y="${29 + fs * .36}" text-anchor="middle" font-family="-apple-system,Helvetica,Arial,sans-serif" font-weight="700" font-size="${fs}" fill="#fff">${esc(mono)}</text>${glyph}</svg>`;
+}
+const brandBadge = (c, px = 30) => `<div class="ico" style="background:${brandColor(c.make)};width:${px}px;height:${px}px;font-size:${Math.round(px * .42)}px;font-weight:700;color:#fff">${esc(monogram(c.make))}</div>`;
+const BODIES = {
+  auto: [['city', 'Utilitaria'], ['sedan', 'Berlina'], ['suv', 'SUV'], ['wagon', 'Station wagon'], ['van', 'Monovolume']],
+  scooter: [['scooter', 'Scooter'], ['moto', 'Moto']],
+};
+const bodyOf = c => { const k = kindOf(c), list = BODIES[k]; return list.some(b => b[0] === c.body) ? c.body : list[0][0]; };
+const ART = {
+  city: { w: 30, x2: 90, r: 8, y: 38, body: 'M6 36 L6 30 Q6 27 10 26 L24 23 Q30 13 42 12 L72 12 Q84 12 90 21 L106 25 Q113 27 113 32 L113 36 Q113 38 110 38 L10 38 Q6 38 6 36 Z', win: 'M33 22 Q37 16 44 16 L56 16 L56 22 Z M61 16 L72 16 Q79 16 84 22 L61 22 Z' },
+  sedan: { w: 28, x2: 94, r: 8, y: 38, body: 'M3 36 L3 30 Q3 27 7 26 L22 24 L34 15 Q38 12 46 12 L70 12 Q78 12 84 17 L92 24 L112 26 Q118 27 118 32 L118 36 Q118 38 115 38 L6 38 Q3 38 3 36 Z', win: 'M37 23 L41 16 L55 16 L55 23 Z M60 16 L70 16 Q74 16 78 19 L84 23 L60 23 Z' },
+  suv: { w: 28, x2: 94, r: 9, y: 40, body: 'M4 38 L4 28 Q4 25 8 24 L20 22 L30 11 Q33 8 38 8 L88 8 Q93 8 96 12 L102 22 L112 24 Q117 26 117 31 L117 38 Q117 40 114 40 L8 40 Q4 40 4 38 Z', win: 'M34 21 L38 13 L56 13 L56 21 Z M61 13 L86 13 Q89 13 91 16 L95 21 L61 21 Z' },
+  wagon: { w: 28, x2: 94, r: 8, y: 38, body: 'M3 36 L3 30 Q3 27 7 26 L24 23 L34 14 Q37 11 43 11 L96 11 Q101 11 103 15 L108 25 L114 27 Q118 28 118 32 L118 36 Q118 38 115 38 L6 38 Q3 38 3 36 Z', win: 'M37 22 L41 15 L58 15 L58 22 Z M63 15 L94 15 L98 22 L63 22 Z' },
+  van: { w: 28, x2: 94, r: 8, y: 40, body: 'M4 38 L4 28 Q4 25 8 24 L22 21 Q30 9 42 8 L92 8 Q102 8 105 20 L112 25 Q117 27 117 32 L117 38 Q117 40 114 40 L8 40 Q4 40 4 38 Z', win: 'M33 20 Q37 13 44 13 L58 13 L58 20 Z M63 13 L90 13 Q95 13 97 20 L63 20 Z' },
+};
+function vehicleArt(body) {
+  const wheel = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="rgba(10,10,14,.8)"/><circle cx="${x}" cy="${y}" r="${r * .45}" fill="rgba(255,255,255,.75)"/>`;
+  if (body === 'scooter') return `<svg class="vart" viewBox="0 0 120 52" aria-hidden="true"><g fill="currentColor"><path d="M16 26 Q17 17 28 17 H46 Q52 17 54 22 L58 30 H30 Q18 30 14 26 Z"/><path d="M15 15 H47 Q51 15 51 18 H15 Z"/><path d="M44 30 H80 Q84 30 84 34 H44 Z"/><path d="M82 36 L89 12 H95 L89 36 Z"/><path d="M84 8 H100 Q101 8 101 10 H84 Z"/><circle cx="99" cy="17" r="3.5"/></g>${wheel(26, 40, 9)}${wheel(94, 40, 9)}</svg>`;
+  if (body === 'moto') return `<svg class="vart" viewBox="0 0 120 52" aria-hidden="true"><g fill="currentColor"><path d="M44 21 Q57 13 70 21 L68 29 H46 Z"/><path d="M20 22 Q32 17 44 22 L47 26 H20 Z"/><path d="M47 29 H69 L74 37 H50 Z"/><path d="M92 40 L80 15 H85 L98 40 Z"/><path d="M78 11 H92 Q93 11 93 13 H78 Z"/><path d="M24 36 H52 V39 H24 Z"/></g>${wheel(24, 39, 10)}${wheel(96, 39, 10)}</svg>`;
+  const a = ART[body] || ART.city;
+  return `<svg class="vart" viewBox="0 0 120 52" aria-hidden="true"><path d="${a.body}" fill="currentColor"/><path d="${a.win}" fill="rgba(0,0,0,.3)"/>${wheel(a.w, a.y, a.r)}${wheel(a.x2, a.y, a.r)}</svg>`;
+}
+
+const CAR_COLORS = [['#f5f5f7', 'Bianco'], ['#c7c7cc', 'Argento'], ['#8e8e93', 'Grigio'], ['#1c1c1e', 'Nero'], ['#d70015', 'Rosso'], ['#ff9500', 'Arancione'], ['#ffcc00', 'Giallo'], ['#248a3d', 'Verde'], ['#0a60d0', 'Blu'], ['#5ac8fa', 'Azzurro'], ['#8b5e3c', 'Marrone'], ['#8944ab', 'Viola']];
+const shade = (hex, t) => { const n = parseInt(hex.slice(1), 16); const m = t < 0 ? 0 : 255, a = Math.abs(t); const f = v => Math.round(v + (m - v) * a); return [f(n >> 16), f((n >> 8) & 255), f(n & 255)]; };
+const rgb = a => `rgb(${a.join(',')})`;
+const lum = hex => { const n = parseInt(hex.slice(1), 16); return (0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255; };
+function heroLook(car) {
+  const c = car.color; if (!c || !/^#[0-9a-f]{6}$/i.test(c)) return { style: '', cls: '' };
+  const light = lum(c) > 0.6;
+  const top = shade(c, light ? 0.3 : 0.1), bot = shade(c, light ? -0.14 : -0.45), sh = shade(c, -0.3);
+  return { cls: light ? 'lt' : '', style: `background:linear-gradient(135deg,${rgb(top)} 0%,${rgb(bot)} 100%);box-shadow:0 10px 30px rgba(${sh.join(',')},.38)` };
+}
+const ACCENTS = [['blue', 'Blu', ''], ['green', 'Verde', '#25a85a'], ['orange', 'Arancio', '#f2780c'], ['pink', 'Rosa', '#ff375f'], ['purple', 'Viola', '#a24ee0'], ['teal', 'Turchese', '#0fa3b1']];
+const CHEV = '<svg class="chev" viewBox="0 0 8 14"><path d="M1 1l6 6-6 6"/></svg>';
+const frow = (label, id, html) => `<label class="frow" for="${id}"><span>${label}</span>${html}</label>`;
+const inp = (id, val, ph = '', extra = '') => `<input id="${id}" value="${esc(val ?? '')}" placeholder="${esc(ph)}" autocomplete="off" ${extra}>`;
+const typeIco = t => `<div class="ico" style="background:${t.c}">${t.e}</div>`;
+
+function remRow(x, car) {
+  const t = typeOf(x.r.type), s = x.s;
+  return `<button class="row two icon tap" data-a="editReminder" data-id="${x.r.id}">${typeIco(t)}
+    <div class="t"><div class="a">${esc(x.r.title || t.n)}</div><div class="b">${esc(s.sub)}</div></div>
+    <span class="badge l${s.level}">${esc(s.badge)}</span>${CHEV}</button>`;
+}
+function svcRow(s) {
+  const t = typeOf(s.type);
+  const main = s.title || t.n;
+  const sub = [s.title ? t.n : null, fmtDate(s.date), s.km ? fmtKm(s.km) : null, s.shop].filter(Boolean).join(' · ');
+  return `<button class="row two icon tap" data-a="editService" data-id="${s.id}">${typeIco(t)}
+    <div class="t"><div class="a">${esc(main)}</div><div class="b">${esc(sub)}</div></div>
+    ${(s.photoIds || []).length ? '<span class="v">📎</span>' : ''}
+    ${s.cost > 0 ? `<span class="amount">${nfEur.format(s.cost)}</span>` : ''}${CHEV}</button>`;
+}
+
+/* ================= schermate ================= */
+function vWelcome() {
+  return `<div class="welcome">
+    <img class="logo" src="apple-touch-icon.png" alt="">
+    <h1>iGarage</h1>
+    <p>Il libretto di manutenzione della tua auto<br>o del tuo scooter, sempre in tasca.</p>
+    <div class="feat">${typeIco({ c: '#0a84ff', e: '🔧' }).replace('class="ico"', 'class="ico"')}<div><b>Interventi e scontrini</b><span>Registra lavori, costi e foto delle fatture.</span></div></div>
+    <div class="feat">${typeIco({ c: '#ff9f0a', e: '⏰' })}<div><b>Promemoria intelligenti</b><span>Tagliando a km o a data, bollo, assicurazione, revisione, patente.</span></div></div>
+    <div class="feat">${typeIco({ c: '#30d158', e: '📊' })}<div><b>Quanto spendi davvero</b><span>Costi per categoria, per anno e per chilometro.</span></div></div>
+    <button class="btn sp" data-a="addCar">Aggiungi il tuo veicolo</button>
+    <button class="linkbtn" data-a="import">Ho già un backup: importa</button>
+    ${window.GARAGE_PREVIEW ? '<button class="linkbtn" data-a="demo">Prova con dati di esempio</button>' : ''}
+  </div>`;
+}
+
+function vAuto() {
+  const car = curCar();
+  const items = carRems(car);
+  const bad = items.filter(x => x.s.level === 2).length;
+  const soon = items.filter(x => x.s.level === 1).length;
+  const est = estKm(car);
+  const showEst = est - (car.km || 0) >= 50;
+  const sub = [car.engine, car.year, car.fuel].filter(Boolean).join(' · ');
+  const upd = car.kmDate ? `Aggiornati ${relDays(daysBetween(today(), car.kmDate))}` : '';
+  const look = heroLook(car);
+  const ritems = items.filter(x => x.s.level >= 0), rtot = ritems.length, rok = ritems.filter(x => x.s.level === 0).length, rworst = ritems.reduce((m, x) => Math.max(m, x.s.level), 0);
+  const RR = 24, RC = 2 * Math.PI * RR;
+  const ring = rtot ? `<div class="ring" aria-label="${rok} scadenze su ${rtot} in regola"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="${RR}" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="5"/><circle cx="30" cy="30" r="${RR}" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-dasharray="${Math.max(0.01, RC * rok / rtot)} ${RC}" transform="rotate(-90 30 30)"/></svg><b>${rok}/${rtot}</b><i class="d l${rworst}"></i></div><span class="ringcap">in regola</span>` : '';
+  const art = car.photoId ? `<img class="avatar" data-ph="${car.photoId}" alt="">` : `<div class="heroart">${vehicleArt(bodyOf(car))}<span class="bb" style="background:${brandColor(car.make)}">${esc(monogram(car.make))}</span></div>`;
+  const hero = `<div class="hero ${look.cls} ${S.slide ? 'slide-' + S.slide : ''}" style="${look.style}">
+    <div class="hero-top"><div class="hl">
+      ${car.plate ? `<div class="plate"><i>I</i><b>${esc(fmtPlate(car.plate))}</b></div>` : ''}
+      <div class="cn">${esc(carName(car))}</div>${sub ? `<div class="cs">${esc(sub)}</div>` : ''}
+    </div>${art}</div>
+    <div class="kmrow"><span class="kmn" data-count="${car.km || 0}">${nfInt.format(car.km || 0)}</span><span class="kmu">km</span></div>
+    <div class="kms">${esc(upd)}${showEst ? ` · stima oggi ≈ ${nfInt.format(est)} km` : ''}</div>
+    <button class="hbtn" data-a="updateKm">Aggiorna km</button>
+    ${ring}
+  </div>${db.cars.length > 1 ? `<div class="dots">${db.cars.map(c => `<button class="${c.id === car.id ? 'on' : ''}" data-a="pickCarId" data-id="${c.id}" aria-label="${esc(carName(c))}"></button>`).join('')}</div>` : ''}`;
+  S.slide = null;
+  let status;
+  if (!items.length) status = `<button class="status l0" data-a="goto" data-t="scadenze"><div class="si">＋</div><div><div class="a">Nessuna scadenza impostata</div><div class="b">Aggiungi tagliando, bollo, assicurazione…</div></div></button>`;
+  else if (bad) status = `<button class="status l2" data-a="goto" data-t="scadenze"><div class="si">!</div><div><div class="a">${bad} ${bad === 1 ? 'scaduta' : 'scadute'}</div><div class="b">${esc(items[0].r.title || typeOf(items[0].r.type).n)} · ${esc(items[0].s.sub.toLowerCase())}</div></div></button>`;
+  else if (soon) status = `<button class="status l1" data-a="goto" data-t="scadenze"><div class="si">!</div><div><div class="a">${soon} in scadenza</div><div class="b">${esc(items[0].r.title || typeOf(items[0].r.type).n)} · ${esc(items[0].s.sub.toLowerCase())}</div></div></button>`;
+  else status = `<button class="status ok" data-a="goto" data-t="scadenze"><div class="si">✓</div><div><div class="a">Tutto in regola</div><div class="b">Nessuna scadenza nei prossimi giorni</div></div></button>`;
+  const up = items.filter(x => x.s.level >= 0).slice(0, 3);
+  const recent = db.services.filter(s => s.carId === car.id).sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 3);
+  let banners = '';
+  const hasData = db.services.length > 0;
+  const lb = db.settings.lastBackup;
+  if (hasData && (!lb || daysBetween(lb.slice(0, 10), today()) > 45)) {
+    banners += `<div class="banner"><div class="bi">💾</div><div><b>Fai un backup</b>I dati sono solo su questo iPhone. Salvane una copia in File o iCloud.<br><button class="lk" data-a="export">Crea backup</button></div></div>`;
+  }
+  if (isIOS() && !isStandalone() && !db.settings.hideInstall) {
+    banners += `<div class="banner"><div class="bi">📲</div><div><b>Usala come un'app</b>Tocca Condividi e poi «Aggiungi alla schermata Home».</div><button class="x" data-a="hideInstall">✕</button></div>`;
+  }
+  return {
+    title: 'iGarage',
+    right: `<button data-a="goto" data-t="cerca" aria-label="Cerca">${ICON.search}</button>` + (db.cars.length > 1 ? `<button class="lnk" data-a="pickCar">Cambia</button>` : ''),
+    body: (car.msNew ? `<div class="banner ms" style="margin-top:0"><span class="confetti">${Array.from({ length: 18 }, (_, i) => `<i style="--x:${(i * 37 + 5) % 96}%;--d:${(i % 6) * 0.11}s;--c:${['#ff453a', '#ffd60a', '#30d158', '#0a84ff', '#bf5af2', '#ff9f0a'][i % 6]}"></i>`).join('')}</span><div class="bi">🎉</div><div><b>Traguardo: ${nfInt.format(car.msNew)} km</b>${car.msNew % 100000 === 0 ? 'Un numero tondo! ' : ''}${esc(carName(car))} ha superato ${nfInt.format(car.msNew)} km.</div><button class="x" data-a="hideMs">✕</button></div>` : '') + hero +
+      `<div class="two-btn"><button class="btn gray" data-a="addService">＋ Intervento</button><button class="btn gray" data-a="addReminder">＋ Scadenza</button></div>` +
+      status +
+      `<div class="two-btn" style="margin-top:10px"><button class="btn gray" data-a="park">${car.park ? (kindOf(car) === 'scooter' ? '📍 Dov\'è lo scooter' : '📍 Dov\'è l\'auto') : '🅿️ Parcheggio'}</button><button class="btn gray" data-a="checks">✅ Controlli</button></div>` +
+      (up.length ? `<div class="group-title">In arrivo</div><div class="group">${up.map(x => remRow(x, car)).join('')}</div>` : '') +
+      (recent.length ? `<div class="group-title">Ultimi interventi</div><div class="group">${recent.map(svcRow).join('')}</div>` : '') +
+      archiveGroup(car) +
+      banners,
+  };
+}
+function archiveGroup(car) {
+  const nd = docCount(car), nf = db.fines.filter(f => f.carId === car.id && !f.paid).length;
+  const rem = db.reminders.find(r => r.carId === car.id && r.type === 'assicurazione');
+  const row = (t, e, c, a, b) => `<button class="row two icon tap" data-a="goto" data-t="${t}">${typeIco({ c, e })}<div class="t"><div class="a">${a}</div><div class="b">${esc(b)}</div></div>${CHEV}</button>`;
+  return `<div class="group-title">Archivio</div><div class="group">` +
+    row('docs', '📘', '#0a84ff', 'Documenti', nd ? nd + (nd === 1 ? ' documento salvato' : ' documenti salvati') : 'Libretto, assicurazione, patente…') +
+    row('assic', '🛡️', '#5e5ce6', 'Assicurazione', rem ? remStatus(rem, car).sub : 'Scadenza e preventivi') +
+    row('multe', '🚨', '#ff453a', 'Multe', nf ? nf + (nf === 1 ? ' da pagare' : ' da pagare') : 'Scadenze e importi') +
+    row('contatti', '📞', '#30d158', 'Contatti utili', db.contacts.length ? db.contacts.length + ' salvati' : 'Assistenza, officina, assicurazione') +
+    `</div>`;
+}
+const docCount = car => db.docs.filter(d => d.carId === car.id).length;
+
+function docRow(d) {
+  const t = DOC[d.type] || DOC.altro;
+  let level = 0, badge = '';
+  if (d.expires) {
+    const days = daysBetween(today(), d.expires);
+    level = days < 0 ? 2 : days <= 30 ? 1 : 0;
+    if (level === 2) badge = 'Scaduto'; else if (level === 1) badge = days + ' g';
+  }
+  const n = (d.photoIds || []).length;
+  const sub = [d.title ? t.n : null, d.expires ? 'Scade ' + fmtDate(d.expires) : null, n ? n + (n === 1 ? ' foto' : ' foto') : 'Nessuna foto'].filter(Boolean).join(' · ');
+  return `<button class="row two icon tap" data-a="editDoc" data-id="${d.id}">${typeIco(t)}
+    <div class="t"><div class="a">${esc(d.title || t.n)}</div><div class="b">${esc(sub)}</div></div>
+    ${badge ? `<span class="badge l${level}">${badge}</span>` : ''}${CHEV}</button>`;
+}
+function vDocs() {
+  const car = curCar();
+  const list = db.docs.filter(d => d.carId === car.id).sort((a, b) => DOCT.findIndex(t => t.k === a.type) - DOCT.findIndex(t => t.k === b.type) || (a.createdAt || 0) - (b.createdAt || 0));
+  const body = list.length
+    ? `<div class="group">${list.map(docRow).join('')}</div><div class="group-foot">Tocca un documento per vedere le foto. I documenti restano solo su questo iPhone, come il resto dei dati.</div>`
+    : `<div class="empty"><div class="big">📘</div><h2>Nessun documento</h2><p>Fotografa libretto, assicurazione e patente: li avrai sempre con te, anche senza rete.</p><button class="btn" data-a="addDoc">Aggiungi documento</button></div>`;
+  return { title: 'Documenti', left: `<button class="lnk" data-a="tab" data-t="auto">‹ Indietro</button>`, right: `<button data-a="addDoc" aria-label="Aggiungi">${ICON.plus}</button>`, body };
+}
+
+function vServ() {
+  const car = curCar();
+  let list = db.services.filter(s => s.carId === car.id);
+  const used = TYPES.filter(t => list.some(s => s.type === t.k));
+  if (S.filter !== 'tutti' && !used.some(t => t.k === S.filter)) S.filter = 'tutti';
+  const chips = list.length ? `<div class="chips"><button class="chip ${S.filter === 'tutti' ? 'on' : ''}" data-a="filter" data-f="tutti">Tutti</button>${used.map(t => `<button class="chip ${S.filter === t.k ? 'on' : ''}" data-a="filter" data-f="${t.k}">${t.e} ${t.n}</button>`).join('')}</div>` : '';
+  if (S.filter !== 'tutti') list = list.filter(s => s.type === S.filter);
+  list.sort((a, b) => b.date.localeCompare(a.date) || (b.createdAt || 0) - (a.createdAt || 0));
+  let body;
+  if (!list.length) {
+    body = `<div class="empty"><div class="big">🔧</div><h2>Nessun intervento</h2><p>Registra tagliandi, riparazioni e spese, anche con la foto dello scontrino.</p><button class="btn" data-a="addService">Aggiungi intervento</button></div>`;
+  } else {
+    const years = {};
+    list.forEach(s => (years[s.date.slice(0, 4)] = years[s.date.slice(0, 4)] || []).push(s));
+    body = Object.keys(years).sort().reverse().map((y, i) => {
+      const tot = years[y].reduce((a, s) => a + (s.cost || 0), 0);
+      return `<div class="group-title ${i === 0 ? 'first' : ''}"><span>${y}</span><span>${tot > 0 ? nfEur0.format(tot) : ''}</span></div><div class="group">${years[y].map(svcRow).join('')}</div>`;
+    }).join('');
+  }
+  return { title: 'Interventi', right: `<button data-a="addService" aria-label="Aggiungi">${ICON.plus}</button>`, body: chips + body };
+}
+
+const MESI = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+function everyTxt(t) {
+  if (t.season) return `Ogni anno entro il ${t.season[1]} ${MESI[t.season[0]]}`;
+  const mm = t.mesi ? (t.mesi >= 24 && t.mesi % 12 === 0 ? t.mesi / 12 + ' anni' : t.mesi + ' mesi') : '';
+  const every = [t.km ? nfInt.format(t.km) + ' km' : '', mm].filter(Boolean).join(' o ');
+  return every ? 'Ogni ' + every : 'A data';
+}
+function vRem() {
+  const car = curCar();
+  const items = carRems(car);
+  const have = new Set(items.map(x => x.r.type));
+  const quick = quickFor(car).filter(k => !have.has(k));
+  let body = '';
+  const fl = db.fines.filter(f => f.carId === car.id && !f.paid && f.due && daysBetween(today(), f.due) <= 30).sort((a, b) => a.due.localeCompare(b.due));
+  if (fl.length) body += `<div class="group-title first">Multe da pagare</div><div class="group">${fl.map(fineRow).join('')}</div><div class="group-title">Scadenze</div>`;
+  if (items.length) body += `<div class="group">${items.map(x => remRow(x, car)).join('')}</div>`;
+  else body += `<div class="empty" style="padding-bottom:12px"><div class="big">⏰</div><h2>Nessuna scadenza</h2><p>Scegli quelle che ti servono qui sotto, oppure creane una tua.</p></div>`;
+  if (quick.length) {
+    body += `<div class="group-title ${items.length ? '' : 'first'}">Aggiungi rapidamente</div><div class="group">${quick.map(k => { const t = TYPE[k]; const every = everyTxt(t); return `<button class="row two icon tap" data-a="addReminder" data-type="${k}">${typeIco(t)}<div class="t"><div class="a">${t.n}</div><div class="b">${every}</div></div>${CHEV}</button>`; }).join('')}</div>`;
+  }
+  if (items.length) body += `<div class="group-title">Calendario</div><div class="group"><button class="row two icon tap" data-a="exportICS">${typeIco({ c: '#ff3b30', e: '🗓️' })}<div class="t"><div class="a">Aggiungi al Calendario</div><div class="b">Così ti avvisa anche ad app chiusa</div></div>${CHEV}</button></div>`;
+  body += `<div class="group-foot">Il promemoria scatta in base ai km o alla data, quello che arriva prima. Quando registri l'intervento corrispondente, la scadenza successiva si calcola da sola.</div>`;
+  return { title: 'Scadenze', right: `<button data-a="addReminder" aria-label="Aggiungi">${ICON.plus}</button>`, body };
+}
+
+function monthBars(car) {
+  const sv = db.services.filter(s => s.carId === car.id && s.cost > 0);
+  const now = new Date(), ms = [];
+  for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth() - i, 1); ms.push({ k: d.getFullYear() + '-' + pad(d.getMonth() + 1), l: 'GFMAMGLASOND'[d.getMonth()], v: 0 }); }
+  sv.forEach(s => { const m = ms.find(x => x.k === s.date.slice(0, 7)); if (m) m.v += s.cost; });
+  const max = Math.max(...ms.map(m => m.v));
+  if (!max) return `<div class="group"><div class="row"><div class="t"><div class="b">Nessuna spesa negli ultimi 12 mesi.</div></div></div></div>`;
+  return `<div class="group mbars"><div class="mb">${ms.map(m => `<div class="mcol"><em>${m.v === max ? nfEur0.format(m.v) : ''}</em><i style="height:${m.v ? Math.max(4, Math.round(m.v / max * 100)) : 0}%"></i><span>${m.l}</span></div>`).join('')}</div></div>`;
+}
+function vCosts() {
+  const car = curCar();
+  const c = costStats(car);
+  if (!c.count) return { title: 'Costi', body: `<div class="empty"><div class="big">📊</div><h2>Ancora nessun costo</h2><p>Quando inserisci un intervento con il costo, qui vedrai quanto spendi.</p><button class="btn" data-a="addService">Aggiungi intervento</button></div>` };
+  const cats = Object.entries(c.byCat).sort((a, b) => b[1] - a[1]);
+  const years = Object.entries(c.byYear).sort((a, b) => b[0].localeCompare(a[0]));
+  const maxY = Math.max(...years.map(y => y[1]));
+  return {
+    title: 'Costi',
+    body: `<div class="stats">
+      <div class="stat"><div class="n">${nfEur0.format(c.total)}</div><div class="l">Totale speso</div></div>
+      <div class="stat"><div class="n">${nfEur0.format(c.thisYear)}</div><div class="l">Quest'anno</div></div>
+      <div class="stat"><div class="n">${nfEur0.format(c.last12)}</div><div class="l">Ultimi 12 mesi</div></div>
+      <div class="stat"><div class="n">${c.perKm ? nfEur.format(c.perKm) : '—'}</div><div class="l">Costo per km</div></div>
+    </div>
+    <div class="group donutg"><div class="donut" style="background:conic-gradient(${(() => { let acc = 0; return cats.map(([k, v]) => { const s = acc / c.total * 100; acc += v; return `${typeOf(k).c} ${s}% ${acc / c.total * 100}%`; }).join(','); })()})"><div class="dh"><b>${nfEur0.format(c.total)}</b><span>in totale</span></div></div></div>
+    <div class="group-title">Ultimi 12 mesi</div>${monthBars(car)}
+    <div class="group-title">Per categoria</div>
+    <div class="group bars">${cats.map(([k, v]) => { const t = typeOf(k); const p = Math.round(v / c.total * 100); return `<div class="brow"><div class="top"><span><span class="ico" style="background:${t.c};width:26px;height:26px;font-size:14px">${t.e}</span>${t.n}</span><span>${nfEur0.format(v)} <span class="muted">· ${p}%</span></span></div><div class="bar"><i style="width:${Math.max(3, p)}%;background:${t.c}"></i></div></div>`; }).join('')}</div>
+    <div class="group-title">Per anno</div>
+    <div class="group bars">${years.map(([y, v]) => `<div class="brow"><div class="top"><span>${y}</span><span>${nfEur0.format(v)}</span></div><div class="bar"><i style="width:${Math.max(3, Math.round(v / maxY * 100))}%;background:var(--blue)"></i></div></div>`).join('')}</div>`,
+  };
+}
+
+function vMore() {
+  const lb = db.settings.lastBackup;
+  const lbTxt = lb ? fmtDate(lb.slice(0, 10)) : 'Mai';
+  return {
+    title: 'Altro',
+    body: `<div class="group-title first">I miei veicoli</div>
+    <div class="group">${db.cars.map(c => `<button class="row two icon tap" data-a="editCar" data-id="${c.id}">${brandBadge(c, 30)}<div class="t"><div class="a">${esc(carName(c))}</div><div class="b">${esc([c.plate ? fmtPlate(c.plate) : '', fmtKm(c.km)].filter(Boolean).join(' · '))}</div></div>${db.settings.carId === c.id || db.cars.length === 1 ? '<span class="v">In uso</span>' : ''}${CHEV}</button>`).join('')}
+      <button class="row icon tap blue" data-a="addCar"><div class="ico" style="background:var(--bg3);color:var(--blue)">＋</div><div class="t"><div class="a">Aggiungi auto o scooter</div></div></button></div>
+    <div class="group-title">Aspetto</div>
+    <div class="group"><div class="seg">${[['auto', 'Automatico'], ['light', 'Chiaro'], ['dark', 'Scuro']].map(([k, l]) => `<button class="${(db.settings.theme || 'auto') === k ? 'on' : ''}" data-a="setTheme" data-v="${k}">${l}</button>`).join('')}</div></div>
+    <div class="group-foot">Automatico segue l'aspetto chiaro o scuro del tuo iPhone.</div>
+    <div class="group-title">Colore dell'app</div>
+    <div class="group"><div class="swatches">${ACCENTS.map(([k, n, h]) => `<button class="sw ${(db.settings.accent || 'blue') === k ? 'on' : ''}" data-a="setAccent" data-v="${k}" style="--c:${h || '#0a84ff'}" aria-label="${n}"></button>`).join('')}</div></div>
+    <div class="group-title">Dati</div>
+    <div class="group">
+      <button class="row two icon tap" data-a="export"><div class="ico" style="background:var(--green)">⬆️</div><div class="t"><div class="a">Esporta backup</div><div class="b">Ultimo backup: ${lbTxt}</div></div>${CHEV}</button>
+      <button class="row icon tap" data-a="import"><div class="ico" style="background:var(--orange)">⬇️</div><div class="t"><div class="a">Importa backup</div></div>${CHEV}</button>
+    </div>
+    <div class="group-foot">I dati restano solo su questo iPhone. Se cancelli l'app o i dati di Safari li perdi: ogni tanto esporta un backup e salvalo in File o iCloud.</div>
+    <div class="group-title">Zona pericolosa</div>
+    <div class="group"><button class="row tap red" data-a="wipe">Cancella tutti i dati</button></div>
+    <div class="group-foot" style="text-align:center;margin-top:24px">iGarage · versione 1.5</div>`,
+  };
+}
+
+/* ================= tema ================= */
+const darkMQ = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
+function applyTheme() {
+  const pref = db.settings.theme || 'auto';
+  try { localStorage.setItem('garage-theme', pref); } catch (e) {}
+  const dark = pref === 'dark' || (pref === 'auto' && (!darkMQ || darkMQ.matches));
+  document.documentElement.setAttribute('data-skin', dark ? 'dark' : 'light');
+  const ac = ACCENTS.find(a => a[0] === db.settings.accent);
+  if (ac && ac[2]) document.documentElement.style.setProperty('--blue', ac[2]); else document.documentElement.style.removeProperty('--blue');
+  document.querySelectorAll('meta[name=theme-color]').forEach(m => m.setAttribute('content', dark ? '#000000' : '#f2f2f7'));
+}
+if (darkMQ && darkMQ.addEventListener) darkMQ.addEventListener('change', applyTheme);
+
+/* ================= render ================= */
+const TABS = [['auto', 'Auto'], ['interventi', 'Interventi'], ['scadenze', 'Scadenze'], ['costi', 'Costi'], ['altro', 'Altro']];
+function render(keep = true) {
+  applyTheme();
+  const sc = $('#screen'), nav = $('#nav');
+  const top = keep ? sc.scrollTop : 0;
+  const welcome = !db.cars.length && S.tab !== 'altro';
+  let v;
+  if (welcome) v = { welcome: true, body: vWelcome() };
+  else v = { auto: vAuto, interventi: vServ, scadenze: vRem, costi: vCosts, altro: vMore, docs: vDocs, contatti: vContacts, multe: vFines, assic: vAssic, cerca: vSearch }[S.tab]();
+  sc.innerHTML = (v.welcome ? '' : `<h1 class="large">${esc(v.title)}</h1>`) + v.body;
+  nav.innerHTML = v.welcome ? '' : `<div class="slot l">${v.left || ''}</div><div class="small">${esc(v.title)}</div><div class="slot r">${v.right || ''}</div>`;
+  sc.scrollTop = top;
+  nav.classList.toggle('solid', top > 38);
+  const n = alertCount();
+  $('#tabbar').innerHTML = TABS.map(([k, l]) => `<button class="tab ${S.tab === k || (['docs', 'contatti', 'multe', 'assic', 'cerca'].includes(S.tab) && k === 'auto') ? 'on' : ''}" data-a="tab" data-t="${k}">${ICON[k === 'auto' && curCar() && kindOf(curCar()) === 'scooter' ? 'scooter' : k]}<span>${l}</span>${k === 'scadenze' && n ? `<b class="dot">${n}</b>` : ''}</button>`).join('');
+  hydrate(document);
+  if (S.tab === 'cerca') bindSearch();
+  const kc = $('.kmn[data-count]');
+  if (S.intro) { S.intro = false; if (kc) countUp(kc, +kc.dataset.count); }
+  const sp = $('#splash'); if (sp && !sp.dataset.go) { sp.dataset.go = 1; setTimeout(() => { sp.classList.add('out'); setTimeout(() => sp.remove(), 450); }, 380); }
+}
+function countUp(el, to) {
+  if (!to || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  const t0 = performance.now(), D = 650;
+  const step = t => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3); el.textContent = nfInt.format(Math.round(to * e)); if (k < 1) requestAnimationFrame(step); else el.textContent = nfInt.format(to); };
+  requestAnimationFrame(step);
+}
+function hydrate(root) {
+  root.querySelectorAll('img[data-ph]').forEach(async img => {
+    const u = await photoURL(img.dataset.ph);
+    if (u) img.src = u;
+  });
+}
+let toastT;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2400);
+}
+
+/* ================= schede a comparsa ================= */
+let sheetCtx = null, F = null, asItems = [];
+const raf2 = fn => requestAnimationFrame(() => requestAnimationFrame(fn));
+function openSheet({ title, body, onSave, onCancel, saveLabel = 'Salva', noSave = false }) {
+  const ov = $('#overlay');
+  const wasOpen = ov.classList.contains('open');
+  ov.innerHTML = `<div class="backdrop" data-a="sheetCancel"></div><div class="sheet">
+    <div class="sheet-head"><button class="lnk" data-a="sheetCancel">${noSave ? 'Chiudi' : 'Annulla'}</button><div class="ttl">${esc(title)}</div>${noSave ? '<span></span>' : `<button class="lnk b" data-a="sheetSave">${saveLabel}</button>`}</div>
+    <div class="sheet-body">${body}</div></div>`;
+  sheetCtx = { onSave, onCancel, busy: false };
+  if (wasOpen) ov.classList.add('open'); else raf2(() => ov.classList.add('open'));
+  hydrate(ov);
+  const fi = $('#fileIn', ov);
+  if (fi) fi.onchange = onPickPhotos;
+  drawThumbs();
+}
+function closeSheet(saved) {
+  const ov = $('#overlay'), c = sheetCtx;
+  sheetCtx = null;
+  ov.classList.remove('open');
+  setTimeout(() => { if (!sheetCtx) ov.innerHTML = ''; }, 380);
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  if (!saved && c && c.onCancel) c.onCancel();
+}
+function actionSheet(title, items) {
+  const o = $('#as');
+  asItems = items;
+  o.innerHTML = `<div class="backdrop" data-a="asClose"></div><div class="as"><div class="box">${title ? `<div class="as-t">${esc(title)}</div>` : ''}${items.map((it, i) => `<button class="${it.danger ? 'danger' : ''}" data-a="asPick" data-i="${i}">${esc(it.label)}</button>`).join('')}</div><div class="box"><button class="cancel" data-a="asClose">Annulla</button></div></div>`;
+  raf2(() => o.classList.add('open'));
+}
+function closeAS() { const o = $('#as'); o.classList.remove('open'); setTimeout(() => { if (!o.classList.contains('open')) o.innerHTML = ''; }, 350); }
+const confirmAct = (title, label, fn) => actionSheet(title, [{ label, danger: true, fn }]);
+const val = id => { const e = $('#' + id, $('#overlay')); return e ? e.value : ''; };
+
+/* foto */
+const photoBlock = (single, label, addTxt) => `<div class="group-title">${label || (single ? 'Foto' : 'Foto e scontrini')}</div><div class="group"><div class="thumbs" id="thumbs"></div>
+  <label class="row tap"><span class="ico" style="background:var(--blue)">📷</span><span class="t"><span class="a" style="color:var(--blue)">${addTxt || (single ? 'Scegli foto' : 'Aggiungi foto o scontrino')}</span></span>
+  <input id="fileIn" type="file" accept="image/*" ${single ? '' : 'multiple'} hidden></label></div>`;
+function drawThumbs() {
+  const t = $('#thumbs'); if (!t || !F) return;
+  t.innerHTML = F.photos.map(id => `<div class="thumb"><img data-ph="${id}" data-a="viewPhoto" data-id="${id}" alt=""><button class="x" data-a="rmPhoto" data-id="${id}" aria-label="Rimuovi">✕</button></div>`).join('');
+  hydrate(t);
+}
+async function compress(file, max = 1600, q = 0.8) {
+  let bmp;
+  try { bmp = await createImageBitmap(file); }
+  catch (e) { bmp = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); }); }
+  const w = bmp.width || bmp.naturalWidth, h = bmp.height || bmp.naturalHeight;
+  const k = Math.min(1, max / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+  x.drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', q);
+}
+function dropPhoto(id) {
+  F.photos = F.photos.filter(x => x !== id);
+  if (F.added.includes(id)) { F.added = F.added.filter(x => x !== id); phDel(id); phCache.delete(id); }
+  else F.removed.push(id);
+}
+async function onPickPhotos(e) {
+  const files = [...e.target.files];
+  e.target.value = '';
+  if (!files.length || !F) return;
+  try {
+    for (const f of files) {
+      const url = await compress(f);
+      const id = uid();
+      await phPut(id, url); phCache.set(id, url);
+      if (F.single) [...F.photos].forEach(dropPhoto);
+      F.photos.push(id); F.added.push(id);
+      drawThumbs();
+    }
+  } catch (err) { toast('Impossibile leggere la foto'); }
+}
+const finishPhotos = () => { if (!F) return; F.removed.forEach(id => { phDel(id); phCache.delete(id); }); };
+const cancelPhotos = () => { if (!F) return; F.added.forEach(id => { phDel(id); phCache.delete(id); }); };
+
+/* --- auto --- */
+let SK = 'auto', SC = '';
+const fuelsFor = k => (k === 'scooter' ? ['Benzina', 'Elettrica'] : FUELS);
+const PH = { auto: { make: 'Fiat', model: 'Panda', engine: '1.2 69 CV', plate: 'AB123CD' }, scooter: { make: 'Piaggio', model: 'Beverly', engine: '300 cc', plate: 'AB12345' } };
+const kindSeg = k => [['auto', 'Auto'], ['scooter', 'Scooter']].map(([v, l]) => `<button class="${k === v ? 'on' : ''}" data-a="setKind" data-v="${v}">${l}</button>`).join('');
+const swatchHTML = () => `<button class="sw auto ${SC ? '' : 'on'}" data-a="setColor" data-v="" aria-label="Automatico">A</button>` + CAR_COLORS.map(([h, n]) => `<button class="sw ${SC === h ? 'on' : ''}" data-a="setColor" data-v="${h}" style="--c:${h}" aria-label="${n}"></button>`).join('');
+function carSheet(id) {
+  const c = id ? db.cars.find(x => x.id === id) : null;
+  SK = kindOf(c); SC = (c && c.color) || '';
+  F = { photos: c && c.photoId ? [c.photoId] : [], added: [], removed: [], single: true };
+  openSheet({
+    title: c ? 'Modifica veicolo' : 'Nuovo veicolo',
+    body: `<div class="group"><div class="seg" id="kindseg">${kindSeg(SK)}</div></div>
+    <div class="group">
+      ${frow('Targa', 'plate', inp('plate', c && c.plate, PH[SK].plate, 'autocapitalize="characters" spellcheck="false"'))}
+      ${frow('Marca', 'make', inp('make', c && c.make, PH[SK].make, 'autocapitalize="words"'))}
+      ${frow('Modello', 'model', inp('model', c && c.model, PH[SK].model, 'autocapitalize="words"'))}
+      ${frow('Anno', 'year', inp('year', c && c.year, '2018', 'inputmode="numeric" maxlength="4"'))}
+      ${frow('Motore', 'engine', inp('engine', c && c.engine, PH[SK].engine))}
+      ${frow('Alimentazione', 'fuel', `<select id="fuel"><option value="">—</option>${fuelsFor(SK).map(f => `<option ${c && c.fuel === f ? 'selected' : ''}>${f}</option>`).join('')}</select>`)}
+      ${frow('Carrozzeria', 'body', `<select id="body">${BODIES[SK].map(([v, l]) => `<option value="${v}" ${c && bodyOf(c) === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`)}
+      <div id="tyrerow" ${SK === 'scooter' ? 'hidden' : ''}>${frow('Gomme', 'tyres', `<select id="tyres"><option value="">Non specificato</option>${TYRES.map(([v, l]) => `<option value="${v}" ${c && c.tyres === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`)}</div>
+      ${frow('Km attuali', 'km', inp('km', c ? c.km : '', '0', 'inputmode="numeric"'))}
+      ${frow('Telaio (VIN)', 'vin', inp('vin', c && c.vin, 'Facoltativo', 'autocapitalize="characters" spellcheck="false"'))}
+    </div>
+    <div class="group-title">Colore</div><div class="group"><div class="swatches" id="swatches">${swatchHTML()}</div></div>
+    <div class="group-foot">Il colore dell'auto diventa lo sfondo della carta in home. Con «Auto» usa il colore dell'app.</div>
+    <div class="group-foot" id="tyrefoot" ${SK === 'scooter' ? 'hidden' : ''}>Con «Estive e invernali» ti propongo i promemoria per il cambio gomme (entro il 15 novembre e il 15 aprile). Con le altre scelte non li mostro. Ricorda che dal 15 novembre al 15 aprile, sulle strade con l'apposito cartello, servono gomme invernali o catene a bordo.</div>${photoBlock(true)}
+    ${c ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delCar" data-id="${c.id}">Elimina veicolo</button></div>` : ''}`,
+    onCancel: cancelPhotos,
+    onSave: async () => {
+      const plate = val('plate').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const make = val('make').trim(), model = val('model').trim();
+      if (!plate && !make && !model) { toast('Inserisci almeno targa o modello'); return false; }
+      const yr = parseNum(val('year'));
+      const rec = { kind: SK, color: SC, body: val('body'), tyres: SK === 'auto' ? val('tyres') : '', plate, make, model, year: yr ? Math.round(yr) : '', engine: val('engine').trim(), fuel: val('fuel'), vin: val('vin').trim().toUpperCase(), photoId: F.photos[0] || null };
+      const km = Math.max(0, Math.round(parseNum(val('km')) || 0));
+      if (c) {
+        Object.assign(c, rec);
+        if (km !== c.km) logKm(c, today(), km), (c.km = km, c.kmDate = today());
+      } else {
+        const n = { id: uid(), ...rec, km, kmDate: today(), kmLog: [{ date: today(), km }], createdAt: Date.now() };
+        db.cars.push(n); db.settings.carId = n.id;
+      }
+      syncTyres(c || db.cars[db.cars.length - 1]);
+      finishPhotos(); await save(); render(); toast(c ? 'Veicolo aggiornato' : 'Veicolo aggiunto');
+    },
+  });
+}
+function kmSheet() {
+  const car = curCar();
+  openSheet({
+    title: 'Km attuali',
+    body: `<div class="group">${frow('Chilometri', 'km', inp('km', car.km, '', 'inputmode="numeric"'))}</div>
+      <div class="group-foot">Leggi il contachilometri e inserisci il valore. Più spesso lo aggiorni, più precise sono le stime dei promemoria.</div>`,
+    onSave: async () => {
+      const km = Math.round(parseNum(val('km')));
+      if (!km && km !== 0) { toast('Inserisci i chilometri'); return false; }
+      if (km < (car.km || 0)) { toast(`Non può essere meno di ${nfInt.format(car.km)} km`); return false; }
+      logKm(car, today(), km); await save(); render(); toast('Km aggiornati');
+    },
+  });
+  setTimeout(() => { const e = $('#km', $('#overlay')); if (e) { e.focus(); e.select(); } }, 380);
+}
+
+/* --- interventi --- */
+function serviceSheet(id, pre = {}) {
+  const s = id ? db.services.find(x => x.id === id) : null;
+  const car = s ? db.cars.find(c => c.id === s.carId) : curCar();
+  const b = s || { type: pre.type || 'tagliando', title: pre.title || '', date: today(), km: car.km || '', cost: '', shop: '', notes: '', photoIds: [] };
+  F = { photos: [...(b.photoIds || [])], added: [], removed: [], single: false };
+  openSheet({
+    title: s ? 'Intervento' : 'Nuovo intervento',
+    body: `<div class="group">
+      ${frow('Tipo', 'stype', `<select id="stype">${TYPES.map(t => `<option value="${t.k}" ${b.type === t.k ? 'selected' : ''}>${t.e} ${t.n}</option>`).join('')}</select>`)}
+      ${frow('Descrizione', 'stitle', inp('stitle', b.title, 'Facoltativa', 'autocapitalize="sentences"'))}
+      ${frow('Data', 'sdate', `<input id="sdate" type="date" value="${b.date}">`)}
+      ${frow('Km', 'skm', inp('skm', b.km, car.km || '0', 'inputmode="numeric"'))}
+      ${frow('Costo (€)', 'scost', inp('scost', b.cost === '' || b.cost == null ? '' : String(b.cost).replace('.', ','), '0,00', 'inputmode="decimal"'))}
+      ${frow('Officina', 'sshop', inp('sshop', b.shop, 'Facoltativa', 'autocapitalize="words"'))}
+    </div>
+    <div class="group-title">Note</div>
+    <div class="group"><div class="frow col"><textarea id="snotes" rows="3" placeholder="Cosa è stato fatto, ricambi, garanzia…">${esc(b.notes)}</textarea></div></div>
+    ${photoBlock(false)}
+    ${s ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delService" data-id="${s.id}">Elimina intervento</button></div>` : ''}`,
+    onCancel: cancelPhotos,
+    onSave: async () => {
+      const date = val('sdate');
+      if (!date) { toast('Inserisci la data'); return false; }
+      const km = parseNum(val('skm'));
+      const cost = parseNum(val('scost'));
+      const rec = { type: val('stype'), title: val('stitle').trim(), date, km: km ? Math.round(km) : null, cost: cost && cost > 0 ? Math.round(cost * 100) / 100 : null, shop: val('sshop').trim(), notes: val('snotes').trim(), photoIds: [...F.photos] };
+      let rec2 = s;
+      if (s) Object.assign(s, rec);
+      else {
+        rec2 = { id: uid(), carId: car.id, createdAt: Date.now(), ...rec };
+        db.services.push(rec2);
+      }
+      if (rec.km) logKm(car, date, rec.km);
+      if (!s) {
+        db.reminders.filter(r => r.carId === car.id && (r.id === pre.reminderId || (r.type === rec2.type && rec2.type !== 'altro'))).forEach(r => advanceReminder(r, rec2, car, r.id === pre.reminderId));
+      }
+      finishPhotos(); await save(); render(); toast(s ? 'Intervento aggiornato' : 'Intervento salvato');
+    },
+  });
+}
+
+/* ================= contatti, multe, assicurazione, ricerca, calendario ================= */
+const BACK = '<button class="lnk" data-a="tab" data-t="auto">‹ Indietro</button>';
+const ROLES = [['assistenza', 'Assistenza stradale', '🚨', '#ff453a'], ['assicurazione', 'Compagnia assicurativa', '🛡️', '#5e5ce6'], ['officina', 'Officina', '🔧', '#0a84ff'], ['carrozzeria', 'Carrozzeria', '🚘', '#ff6482'], ['gommista', 'Gommista', '🛞', '#8e8e93'], ['altro', 'Altro', '📞', '#30d158']];
+const ROLE = Object.fromEntries(ROLES.map(r => [r[0], { n: r[1], e: r[2], c: r[3] }]));
+const telDigits = s => String(s || '').replace(/[^\d+]/g, '');
+
+/* contatti */
+function vContacts() {
+  const list = db.contacts.slice().sort((a, b) => ROLES.findIndex(r => r[0] === a.role) - ROLES.findIndex(r => r[0] === b.role) || a.name.localeCompare(b.name));
+  const have = new Set(list.map(c => c.role));
+  const quick = ['assistenza', 'assicurazione', 'officina'].filter(k => !have.has(k));
+  let body = list.length ? `<div class="group">${list.map(c => { const r = ROLE[c.role] || ROLE.altro; return `<button class="row two icon tap" data-a="editContact" data-id="${c.id}">${typeIco({ c: r.c, e: r.e })}<div class="t"><div class="a">${esc(c.name)}</div><div class="b">${esc([r.n, c.phone].filter(Boolean).join(' · '))}</div></div>${CHEV}</button>`; }).join('')}</div>`
+    : `<div class="empty" style="padding-bottom:12px"><div class="big">📞</div><h2>Nessun contatto</h2><p>Salva i numeri che servono quando hai un guasto: assistenza stradale, assicurazione, officina.</p></div>`;
+  if (quick.length) body += `<div class="group-title ${list.length ? '' : 'first'}">Aggiungi rapidamente</div><div class="group">${quick.map(k => { const r = ROLE[k]; return `<button class="row icon tap" data-a="addContact" data-role="${k}">${typeIco({ c: r.c, e: r.e })}<div class="t"><div class="a">${r.n}</div></div>${CHEV}</button>`; }).join('')}</div>`;
+  body += `<div class="group-foot">Tocca un contatto e poi «Chiama» per telefonare subito.</div>`;
+  return { title: 'Contatti utili', left: BACK, right: `<button data-a="addContact" aria-label="Aggiungi">${ICON.plus}</button>`, body };
+}
+function contactSheet(id, role) {
+  const c = id ? db.contacts.find(x => x.id === id) : null;
+  const b = c || { role: role || 'assistenza', name: role ? ROLE[role].n : '', phone: '', notes: '' };
+  F = null;
+  openSheet({
+    title: c ? 'Contatto' : 'Nuovo contatto',
+    body: `${c && c.phone ? `<a class="btn" href="tel:${esc(telDigits(c.phone))}" style="margin-top:0">📞 Chiama ${esc(c.phone)}</a>` : ''}
+    <div class="group" ${c && c.phone ? 'style="margin-top:18px"' : ''}>
+      ${frow('Tipo', 'ctype', `<select id="ctype">${ROLES.map(r => `<option value="${r[0]}" ${b.role === r[0] ? 'selected' : ''}>${r[2]} ${r[1]}</option>`).join('')}</select>`)}
+      ${frow('Nome', 'cname', inp('cname', b.name, 'Es. ACI, Officina Rossi', 'autocapitalize="words"'))}
+      ${frow('Telefono', 'cphone', inp('cphone', b.phone, '800 116 800', 'inputmode="tel" type="tel"'))}
+    </div>
+    <div class="group-title">Note</div>
+    <div class="group"><div class="frow col"><textarea id="cnotes" rows="3" placeholder="Numero di polizza, orari, referente…">${esc(b.notes)}</textarea></div></div>
+    ${c ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delContact" data-id="${c.id}">Elimina contatto</button></div>` : ''}`,
+    onSave: async () => {
+      const name = val('cname').trim(); if (!name) { toast('Inserisci un nome'); return false; }
+      const rec = { role: val('ctype'), name, phone: val('cphone').trim(), notes: val('cnotes').trim() };
+      if (c) Object.assign(c, rec); else db.contacts.push({ id: uid(), ...rec });
+      await save(); render(); toast(c ? 'Contatto aggiornato' : 'Contatto salvato');
+    },
+  });
+}
+
+/* multe */
+function fineInfo(f) {
+  if (f.paid) return { level: 0, badge: 'Pagata', days: null };
+  const days = f.due ? daysBetween(today(), f.due) : null;
+  const level = days == null ? 0 : days < 0 ? 2 : days <= 30 ? 1 : 0;
+  return { level, days, badge: days == null ? '' : days < 0 ? 'Scaduta' : days <= 60 ? days + ' g' : Math.round(days / 30.4) + ' mesi' };
+}
+function fineRow(f) {
+  const i = fineInfo(f);
+  const disc = !f.paid && f.notified && addDays(f.notified, 5) >= today() ? `sconto 30% fino al ${fmtDate(addDays(f.notified, 5))}` : '';
+  const sub = [f.paid ? 'Pagata' : f.due ? 'Scade ' + fmtDate(f.due) : null, f.amount > 0 ? nfEur.format(f.amount) : null, disc].filter(Boolean).join(' · ');
+  return `<button class="row two icon tap" data-a="editFine" data-id="${f.id}">${typeIco({ c: '#ff453a', e: '🚨' })}
+    <div class="t"><div class="a">${esc(f.title || 'Multa')}</div><div class="b">${esc(sub)}</div></div>
+    ${i.badge && !f.paid ? `<span class="badge l${i.level}">${esc(i.badge)}</span>` : ''}${CHEV}</button>`;
+}
+function vFines() {
+  const car = curCar();
+  const list = db.fines.filter(f => f.carId === car.id);
+  const open = list.filter(f => !f.paid).sort((a, b) => (a.due || '9').localeCompare(b.due || '9'));
+  const paid = list.filter(f => f.paid).sort((a, b) => (b.due || '').localeCompare(a.due || ''));
+  let body = '';
+  if (!list.length) body = `<div class="empty"><div class="big">🚨</div><h2>Nessuna multa</h2><p>Se ne ricevi una, segnala qui scadenza e importo: ti avviso prima che scatti la maggiorazione.</p><button class="btn" data-a="addFine">Aggiungi multa</button></div>`;
+  else {
+    if (open.length) body += `<div class="group-title first">Da pagare</div><div class="group">${open.map(fineRow).join('')}</div>`;
+    if (paid.length) body += `<div class="group-title ${open.length ? '' : 'first'}">Pagate</div><div class="group">${paid.map(fineRow).join('')}</div>`;
+    body += `<div class="group-foot">Pagando entro 5 giorni dalla notifica lo sconto è del 30%. Il termine ordinario è di 60 giorni dalla notifica.</div>`;
+  }
+  return { title: 'Multe', left: BACK, right: `<button data-a="addFine" aria-label="Aggiungi">${ICON.plus}</button>`, body };
+}
+function fineSheet(id) {
+  const f = id ? db.fines.find(x => x.id === id) : null;
+  const car = f ? db.cars.find(c => c.id === f.carId) : curCar();
+  const b = f || { title: '', notified: today(), amount: '', due: addDays(today(), 60), paid: false, notes: '', photoIds: [] };
+  F = { photos: [...(b.photoIds || [])], added: [], removed: [], single: false };
+  openSheet({
+    title: f ? 'Multa' : 'Nuova multa',
+    body: `<div class="group">
+      ${frow('Motivo', 'ftitle', inp('ftitle', b.title, 'Es. Eccesso di velocità', 'autocapitalize="sentences"'))}
+      ${frow('Notificata il', 'fnot', `<input id="fnot" type="date" value="${b.notified || ''}">`)}
+      ${frow('Importo (€)', 'famount', inp('famount', b.amount === '' || b.amount == null ? '' : String(b.amount).replace('.', ','), '0,00', 'inputmode="decimal"'))}
+      ${frow('Pagare entro', 'fdue', `<input id="fdue" type="date" value="${b.due || ''}">`)}
+      ${frow('Stato', 'fpaid', `<select id="fpaid"><option value="0" ${b.paid ? '' : 'selected'}>Da pagare</option><option value="1" ${b.paid ? 'selected' : ''}>Pagata</option></select>`)}
+    </div>
+    <div class="group-foot" id="fdisc"></div>
+    <div class="group-title">Note</div>
+    <div class="group"><div class="frow col"><textarea id="fnotes" rows="3" placeholder="Luogo, numero verbale, ricorso…">${esc(b.notes)}</textarea></div></div>
+    ${photoBlock(false, 'Foto del verbale', 'Aggiungi foto')}
+    ${f ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delFine" data-id="${f.id}">Elimina multa</button></div>` : ''}`,
+    onCancel: cancelPhotos,
+    onSave: async () => {
+      const amt = parseNum(val('famount'));
+      const rec = { title: val('ftitle').trim(), notified: val('fnot') || null, amount: amt && amt > 0 ? Math.round(amt * 100) / 100 : null, due: val('fdue') || null, paid: val('fpaid') === '1', notes: val('fnotes').trim(), photoIds: [...F.photos] };
+      if (!rec.title && !rec.amount) { toast('Indica il motivo o l\'importo'); return false; }
+      if (f) Object.assign(f, rec); else db.fines.push({ id: uid(), carId: car.id, createdAt: Date.now(), ...rec });
+      finishPhotos(); await save(); render(); toast(f ? 'Multa aggiornata' : 'Multa salvata');
+    },
+  });
+  const o = $('#overlay'), n = $('#fnot', o), d = $('#fdue', o), disc = $('#fdisc', o);
+  const upd = () => { const t = n.value; disc.textContent = t ? `Con il pagamento entro il ${fmtDate(addDays(t, 5))} lo sconto è del 30%.` : ''; };
+  n.onchange = () => { if (!f || !d.value || d.value === addDays(b.notified || today(), 60)) d.value = n.value ? addDays(n.value, 60) : ''; upd(); };
+  upd();
+}
+
+/* assicurazione */
+function vAssic() {
+  const car = curCar();
+  const rem = db.reminders.find(r => r.carId === car.id && r.type === 'assicurazione');
+  const st = rem ? remStatus(rem, car) : null;
+  const last = db.services.filter(s => s.carId === car.id && s.type === 'assicurazione' && s.cost > 0).sort((a, b) => b.date.localeCompare(a.date))[0];
+  const quotes = db.quotes.filter(q => q.carId === car.id).sort((a, b) => a.price - b.price);
+  let cur = '<div class="group-title first">Polizza attuale</div><div class="group">';
+  cur += rem ? `<button class="row two icon tap" data-a="editReminder" data-id="${rem.id}">${typeIco(TYPE.assicurazione)}<div class="t"><div class="a">Scadenza</div><div class="b">${esc(st.dueDate ? fmtDate(st.dueDate) + ' · ' + st.sub.toLowerCase() : st.sub)}</div></div>${st.level ? `<span class="badge l${st.level}">${esc(st.badge)}</span>` : ''}${CHEV}</button>`
+    : `<button class="row two icon tap" data-a="addReminder" data-type="assicurazione">${typeIco(TYPE.assicurazione)}<div class="t"><div class="a">Imposta la scadenza</div><div class="b">Così ti avviso prima del rinnovo</div></div>${CHEV}</button>`;
+  if (last) cur += `<div class="row two"><div class="t"><div class="a">Ultimo premio pagato</div><div class="b">${esc(fmtDate(last.date))}${last.shop ? ' · ' + esc(last.shop) : ''}</div></div><span class="amount">${nfEur0.format(last.cost)}</span></div>`;
+  cur += '</div>';
+  let q = `<div class="group-title">Preventivi</div>`;
+  if (!quotes.length) q += `<div class="group"><div class="row"><div class="t"><div class="b">Nessun preventivo. Prima del rinnovo chiedine due o tre e confrontali qui.</div></div></div></div>`;
+  else q += `<div class="group">${quotes.map((x, i) => {
+    const diff = last ? x.price - last.cost : null;
+    const tag = [i === 0 && quotes.length > 1 ? 'Il più economico' : '', diff != null ? (diff < 0 ? `${nfEur0.format(-diff)} in meno` : diff > 0 ? `${nfEur0.format(diff)} in più` : 'uguale') + ' del premio attuale' : '', x.date ? fmtDate(x.date) : ''].filter(Boolean).join(' · ');
+    return `<button class="row two icon tap" data-a="editQuote" data-id="${x.id}">${typeIco({ c: i === 0 && quotes.length > 1 ? '#30d158' : '#5e5ce6', e: '🧮' })}<div class="t"><div class="a">${esc(x.company || 'Preventivo')}</div><div class="b">${esc(tag)}</div></div><span class="amount">${nfEur0.format(x.price)}</span>${CHEV}</button>`;
+  }).join('')}</div>`;
+  q += `<button class="btn gray" data-a="addQuote" style="margin-top:12px">＋ Aggiungi preventivo</button><div class="group-foot">Ti segnalo la scadenza 30 giorni prima: è il momento giusto per chiedere preventivi.</div>`;
+  return { title: 'Assicurazione', left: BACK, body: cur + q };
+}
+function quoteSheet(id) {
+  const x = id ? db.quotes.find(y => y.id === id) : null;
+  const car = x ? db.cars.find(c => c.id === x.carId) : curCar();
+  const b = x || { company: '', price: '', date: today(), notes: '' };
+  F = null;
+  openSheet({
+    title: x ? 'Preventivo' : 'Nuovo preventivo',
+    body: `<div class="group">
+      ${frow('Compagnia', 'qco', inp('qco', b.company, 'Es. Genertel', 'autocapitalize="words"'))}
+      ${frow('Prezzo annuo (€)', 'qprice', inp('qprice', b.price === '' ? '' : String(b.price).replace('.', ','), '0', 'inputmode="decimal"'))}
+      ${frow('Data', 'qdate', `<input id="qdate" type="date" value="${b.date || ''}">`)}
+    </div>
+    <div class="group-title">Note</div>
+    <div class="group"><div class="frow col"><textarea id="qnotes" rows="3" placeholder="Massimale, franchigia, garanzie incluse…">${esc(b.notes)}</textarea></div></div>
+    ${x ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delQuote" data-id="${x.id}">Elimina preventivo</button></div>` : ''}`,
+    onSave: async () => {
+      const price = parseNum(val('qprice')); if (!price || price <= 0) { toast('Inserisci il prezzo'); return false; }
+      const rec = { company: val('qco').trim(), price: Math.round(price * 100) / 100, date: val('qdate') || null, notes: val('qnotes').trim() };
+      if (x) Object.assign(x, rec); else db.quotes.push({ id: uid(), carId: car.id, ...rec });
+      await save(); render(); toast(x ? 'Preventivo aggiornato' : 'Preventivo salvato');
+    },
+  });
+}
+
+/* cerca tutto */
+const nrm = s => String(s ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function searchItems() {
+  const items = [], cn = id => { const c = db.cars.find(x => x.id === id); return db.cars.length > 1 && c ? carName(c) : ''; };
+  db.services.forEach(s => { const t = typeOf(s.type); items.push({ g: 'Interventi', ico: typeIco(t), a: s.title || t.n, b: [fmtDate(s.date), s.shop, s.cost > 0 ? nfEur.format(s.cost) : '', cn(s.carId)].filter(Boolean).join(' · '), act: 'editService', id: s.id, hay: [t.n, s.title, s.shop, s.notes, fmtDate(s.date), s.cost, s.km] });
+  });
+  db.reminders.forEach(r => { const t = typeOf(r.type); items.push({ g: 'Scadenze', ico: typeIco(t), a: r.title || t.n, b: cn(r.carId) || 'Scadenza', act: 'editReminder', id: r.id, hay: [t.n, r.title] }); });
+  db.docs.forEach(d => { const t = DOC[d.type] || DOC.altro; items.push({ g: 'Documenti', ico: typeIco(t), a: d.title || t.n, b: [t.n, cn(d.carId)].filter(Boolean).join(' · '), act: 'editDoc', id: d.id, hay: [t.n, d.title, d.notes] }); });
+  db.fines.forEach(f => items.push({ g: 'Multe', ico: typeIco({ c: '#ff453a', e: '🚨' }), a: f.title || 'Multa', b: [f.amount > 0 ? nfEur.format(f.amount) : '', f.paid ? 'Pagata' : 'Da pagare', cn(f.carId)].filter(Boolean).join(' · '), act: 'editFine', id: f.id, hay: ['multa', f.title, f.notes, f.amount] }));
+  db.contacts.forEach(c => { const r = ROLE[c.role] || ROLE.altro; items.push({ g: 'Contatti', ico: typeIco({ c: r.c, e: r.e }), a: c.name, b: [r.n, c.phone].filter(Boolean).join(' · '), act: 'editContact', id: c.id, hay: [r.n, c.name, c.phone, c.notes] }); });
+  db.quotes.forEach(x => items.push({ g: 'Preventivi', ico: typeIco({ c: '#5e5ce6', e: '🧮' }), a: x.company || 'Preventivo', b: [nfEur0.format(x.price), cn(x.carId)].filter(Boolean).join(' · '), act: 'editQuote', id: x.id, hay: ['assicurazione preventivo', x.company, x.notes, x.price] }));
+  db.cars.forEach(c => items.push({ g: 'Veicoli', ico: brandBadge(c, 30), a: carName(c), b: [c.plate ? fmtPlate(c.plate) : '', c.engine].filter(Boolean).join(' · '), act: 'pickCarId', id: c.id, hay: [c.make, c.model, c.plate, c.vin, c.engine, c.year] }));
+  items.forEach(i => { i.h = nrm(i.hay.join(' ')); });
+  return items;
+}
+function searchHTML() {
+  const q = nrm(S.q || '').trim();
+  if (!q) return `<div class="empty"><div class="big">🔎</div><h2>Cerca in iGarage</h2><p>Scrivi una parola: un'officina, «pastiglie», una targa, un numero di telefono, un importo.</p></div>`;
+  const toks = q.split(/\s+/);
+  const res = searchItems().filter(i => toks.every(t => i.h.includes(t)));
+  if (!res.length) return `<div class="empty"><div class="big">🤷</div><h2>Nessun risultato</h2><p>Prova con un'altra parola o con meno lettere.</p></div>`;
+  const groups = {}; res.forEach(i => (groups[i.g] = groups[i.g] || []).push(i));
+  return Object.entries(groups).map(([g, l], k) => `<div class="group-title ${k === 0 ? 'first' : ''}">${g}</div><div class="group">${l.slice(0, 30).map(i => `<button class="row two icon tap" data-a="${i.act}" data-id="${i.id}">${i.ico}<div class="t"><div class="a">${esc(i.a)}</div><div class="b">${esc(i.b)}</div></div>${CHEV}</button>`).join('')}</div>`).join('');
+}
+function vSearch() {
+  return { title: 'Cerca', left: BACK, body: `<div class="group"><label class="frow" for="q"><span>${ICON.search.replace('<svg', '<svg style="width:20px;height:20px;stroke:var(--label2);fill:none;stroke-width:2;stroke-linecap:round;vertical-align:-4px"')}</span><input id="q" type="search" placeholder="Cerca interventi, documenti, multe…" autocomplete="off" autocapitalize="none" enterkeyhint="search"></label></div><div id="sres"></div>` };
+}
+function bindSearch() {
+  const i = $('#q'), r = $('#sres'); if (!i) return;
+  i.value = S.q || ''; r.innerHTML = searchHTML();
+  i.oninput = () => { S.q = i.value; r.innerHTML = searchHTML(); };
+  if (!S.q) i.focus();
+}
+
+/* calendario (.ics) */
+const icsEsc = s => String(s ?? '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\;');
+const icsFold = l => { const out = []; while (l.length > 60) { out.push(l.slice(0, 60)); l = ' ' + l.slice(60); } out.push(l); return out; };
+function icsEvents() {
+  const ev = [];
+  for (const car of db.cars) {
+    for (const r of db.reminders.filter(x => x.carId === car.id)) {
+      const s = remStatus(r, car); let date = s.dueDate, est = false;
+      if (!date && s.kmLeft != null) { const rate = kmRate(car); if (rate) { date = addDays(today(), Math.max(0, Math.round(s.kmLeft / rate))); est = true; } }
+      if (!date) continue;
+      ev.push({ uid: 'r-' + r.id, date, title: `${r.title || typeOf(r.type).n} – ${carName(car)}`, desc: est ? 'Data stimata in base ai chilometri percorsi.' : (s.dueKm != null ? `Oppure a ${nfInt.format(s.dueKm)} km.` : '') });
+    }
+    db.docs.filter(d => d.carId === car.id && d.expires).forEach(d => ev.push({ uid: 'd-' + d.id, date: d.expires, title: `Scade: ${d.title || (DOC[d.type] || DOC.altro).n} – ${carName(car)}`, desc: '' }));
+    db.fines.filter(f => f.carId === car.id && !f.paid && f.due).forEach(f => ev.push({ uid: 'f-' + f.id, date: f.due, title: `Pagare multa${f.title ? ': ' + f.title : ''} – ${carName(car)}`, desc: f.amount ? 'Importo ' + nfEur.format(f.amount) : '' }));
+  }
+  return ev;
+}
+function buildICS() {
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+  const d8 = s => s.replace(/-/g, '');
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//iGarage//IT', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:iGarage'];
+  for (const e of icsEvents()) {
+    L.push('BEGIN:VEVENT', `UID:${e.uid}@igarage.app`, `DTSTAMP:${stamp}`, `DTSTART;VALUE=DATE:${d8(e.date)}`, `DTEND;VALUE=DATE:${d8(addDays(e.date, 1))}`, ...icsFold('SUMMARY:' + icsEsc(e.title)));
+    if (e.desc) L.push(...icsFold('DESCRIPTION:' + icsEsc(e.desc)));
+    L.push('TRANSP:TRANSPARENT', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:iGarage', 'TRIGGER:-P6DT15H', 'END:VALARM', 'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:iGarage', 'TRIGGER:-PT15H', 'END:VALARM', 'END:VEVENT');
+  }
+  L.push('END:VCALENDAR');
+  return L.join('\r\n') + '\r\n';
+}
+let pendingICS = null;
+function exportICS() {
+  if (window.GARAGE_PREVIEW) { toast('Il Calendario funziona nell\'app installata'); return; }
+  const n = icsEvents().length;
+  if (!n) { toast('Nessuna scadenza con una data'); return; }
+  const file = new File([buildICS()], 'igarage-scadenze.ics', { type: 'text/calendar' });
+  const fallback = () => { pendingICS = file; openSheet({ title: 'Calendario', noSave: true, body: `<div class="group-foot" style="margin:8px 4px 16px">Ho preparato ${n} promemoria. Tocca il pulsante: se si apre un elenco, scegli «Calendario» oppure salva il file e aprilo da File.</div><button class="btn" data-a="shareICS">Aggiungi al Calendario</button>` }); };
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    navigator.share({ files: [file], title: 'Scadenze iGarage' }).then(() => toast('Fatto')).catch(e => { if (e && e.name === 'AbortError') return; if (e && e.name === 'NotAllowedError') fallback(); else dlICS(file); });
+  } else dlICS(file);
+}
+function dlICS(file) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 8000);
+  toast('File creato: aprilo e scegli Aggiungi al Calendario');
+}
+
+/* --- parcheggio --- */
+const fmtWhen = iso => new Date(iso).toLocaleString('it-IT', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+function ago(iso) {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return 'adesso';
+  if (m < 60) return m + ' min fa';
+  const h = Math.round(m / 60);
+  if (h < 48) return h + (h === 1 ? ' ora fa' : ' ore fa');
+  return Math.round(h / 24) + ' giorni fa';
+}
+function parkSheet() {
+  const car = curCar(), p = car.park, k = kindOf(car) === 'scooter' ? 'lo scooter' : 'l\'auto';
+  const url = p ? `https://maps.apple.com/?ll=${p.lat},${p.lng}&q=${encodeURIComponent('Parcheggio ' + carName(car))}` : '';
+  openSheet({
+    title: 'Parcheggio',
+    noSave: !p,
+    onSave: async () => { car.park.note = val('pnote').trim(); await save(); render(); toast('Nota salvata'); },
+    body: p
+      ? `<div class="group">
+          <div class="row two"><div class="t"><div class="a">Parcheggiato ${esc(ago(p.at))}</div><div class="b">${esc(fmtWhen(p.at))}${p.acc ? ' · precisione ≈ ' + Math.round(p.acc) + ' m' : ''}</div></div></div>
+          ${frow('Nota', 'pnote', inp('pnote', p.note, 'Es. piano -2, settore B', 'autocapitalize="sentences"'))}
+        </div>
+        <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Portami lì con Mappe</a>
+        <button class="btn gray" data-a="parkHere">Aggiorna con la posizione attuale</button>
+        <div class="group" style="margin-top:24px"><button class="row tap red" data-a="parkClear">Cancella parcheggio</button></div>`
+      : `<div class="empty" style="padding-bottom:6px"><div class="big">🅿️</div><h2>Dove hai lasciato ${k}?</h2><p>Salva la posizione adesso: più tardi potrai tornarci con Mappe. Il telefono ti chiederà il permesso di usare la posizione.</p></div>
+        <button class="btn" data-a="parkHere">Salva la posizione qui</button>`,
+  });
+}
+function parkHere() {
+  const car = curCar();
+  if (!navigator.geolocation) { toast('Posizione non disponibile su questo dispositivo'); return; }
+  toast('Cerco la posizione…');
+  navigator.geolocation.getCurrentPosition(async pos => {
+    car.park = { lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6), acc: pos.coords.accuracy || null, at: new Date().toISOString(), note: (car.park && car.park.note) || '' };
+    await save(); render(); parkSheet(); toast('Posizione salvata');
+  }, err => {
+    if (err && err.code === 1) toast('Permesso negato: abilita la posizione per Safari in Impostazioni');
+    else if (err && err.code === 3) toast('Posizione non trovata, riprova all\'aperto');
+    else toast('Posizione non disponibile');
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+
+/* --- lista di controllo --- */
+const CHECK_DEF = {
+  auto: ['Pressione degli pneumatici', 'Livello olio motore', 'Liquido refrigerante', 'Liquido lavavetri', 'Luci e frecce', 'Tergicristalli', 'Freni: corsa del pedale', 'Documenti a bordo', 'Triangolo e giubbotto', 'Kit gonfiaggio o ruota di scorta'],
+  scooter: ['Pressione degli pneumatici', 'Livello olio', 'Freni anteriore e posteriore', 'Luci e frecce', 'Specchietti', 'Cinghia o catena', 'Casco e guanti', 'Documenti a bordo'],
+};
+function checkOf(car) {
+  if (!db.checks) db.checks = {};
+  return db.checks[car.id] || (db.checks[car.id] = { items: CHECK_DEF[kindOf(car)].map(t => ({ id: uid(), t })), done: {}, at: null });
+}
+const checkCount = c => { const n = c.items.filter(i => c.done[i.id]).length; return n === c.items.length && n ? 'Tutto controllato ✓' : `${n} di ${c.items.length} controllati`; };
+let CHK_EDIT = false;
+function checkSheet() {
+  const car = curCar(), c = checkOf(car);
+  openSheet({
+    title: 'Controlli', noSave: true,
+    body: `<div class="group-foot" id="chkcount" style="margin:4px 4px 10px">${esc(checkCount(c))}${c.at ? ' · ultimo controllo ' + esc(ago(c.at)) : ''}</div>
+      <div class="group">${c.items.map(i => `<button class="row tap" data-a="${CHK_EDIT ? 'noop' : 'toggleCheck'}" data-id="${i.id}"><span class="chk ${c.done[i.id] ? 'on' : ''}">✓</span><span class="t"><span class="a">${esc(i.t)}</span></span>${CHK_EDIT ? `<span class="x2" data-a="delCheck" data-id="${i.id}" role="button" aria-label="Elimina voce">✕</span>` : ''}</button>`).join('') || '<div class="row"><span class="b">Nessuna voce</span></div>'}</div>
+      <div class="group"><label class="frow" for="newchk"><span>Nuova voce</span><input id="newchk" placeholder="Es. Controllo batteria" autocomplete="off" autocapitalize="sentences"></label></div>
+      <button class="btn" data-a="addCheck">Aggiungi alla lista</button>
+      <div class="two-btn" style="margin-top:12px"><button class="btn gray" data-a="resetChecks">Azzera le spunte</button><button class="btn gray" data-a="editChecks">${CHK_EDIT ? 'Fine' : 'Modifica elenco'}</button></div>`,
+  });
+}
+
+/* --- documenti --- */
+function docSheet(id) {
+  const d = id ? db.docs.find(x => x.id === id) : null;
+  const car = d ? db.cars.find(c => c.id === d.carId) : curCar();
+  const b = d || { type: 'libretto', title: '', expires: '', notes: '', photoIds: [] };
+  F = { photos: [...(b.photoIds || [])], added: [], removed: [], single: false };
+  openSheet({
+    title: d ? 'Documento' : 'Nuovo documento',
+    body: `<div class="group">
+      ${frow('Tipo', 'dtype', `<select id="dtype">${DOCT.map(t => `<option value="${t.k}" ${b.type === t.k ? 'selected' : ''}>${t.e} ${t.n}</option>`).join('')}</select>`)}
+      ${frow('Nome', 'dtitle', inp('dtitle', b.title, 'Facoltativo', 'autocapitalize="sentences"'))}
+      ${frow('Scadenza', 'dexp', `<input id="dexp" type="date" value="${b.expires || ''}">`)}
+    </div>
+    <div class="group-title">Note</div>
+    <div class="group"><div class="frow col"><textarea id="dnotes" rows="3" placeholder="Numero polizza, compagnia, riferimenti…">${esc(b.notes)}</textarea></div></div>
+    ${photoBlock(false, 'Foto del documento', 'Aggiungi foto')}
+    ${d ? `<div class="group" style="margin-top:24px"><button class="row tap red" data-a="delDoc" data-id="${d.id}">Elimina documento</button></div>` : ''}`,
+    onCancel: cancelPhotos,
+    onSave: async () => {
+      const rec = { type: val('dtype'), title: val('dtitle').trim(), expires: val('dexp') || null, notes: val('dnotes').trim(), photoIds: [...F.photos] };
+      if (d) Object.assign(d, rec); else db.docs.push({ id: uid(), carId: car.id, createdAt: Date.now(), ...rec });
+      finishPhotos(); await save(); render(); toast(d ? 'Documento aggiornato' : 'Documento salvato');
+    },
+  });
+}
+
+/* --- scadenze --- */
+function reminderSheet(id, pre = {}) {
+  const r = id ? db.reminders.find(x => x.id === id) : null;
+  const car = r ? db.cars.find(c => c.id === r.carId) : curCar();
+  const pt = TYPE[pre.type || 'tagliando'];
+  const b = r || { type: pt.k, title: pt.n, everyKm: pt.km || '', everyMonths: pt.mesi || '', baseDate: '', baseKm: '', dueDate: pt.season ? nextSeason(pt) : '' };
+  F = null;
+  openSheet({
+    title: r ? 'Scadenza' : 'Nuova scadenza',
+    body: `<div class="group">
+      ${frow('Tipo', 'rtype', `<select id="rtype">${TYPES.map(t => `<option value="${t.k}" ${b.type === t.k ? 'selected' : ''}>${t.e} ${t.n}</option>`).join('')}</select>`)}
+      ${frow('Nome', 'rtitle', inp('rtitle', b.title, 'Es. Tagliando', 'autocapitalize="sentences"'))}
+    </div>
+    <div class="group-title">Ripeti ogni</div>
+    <div class="group">
+      ${frow('Chilometri', 'rkm', inp('rkm', b.everyKm, 'Facoltativo', 'inputmode="numeric"'))}
+      ${frow('Mesi', 'rmonths', inp('rmonths', b.everyMonths, 'Facoltativo', 'inputmode="numeric"'))}
+    </div>
+    <div class="group-title">Ultimo intervento</div>
+    <div class="group">
+      ${frow('Data', 'rbdate', `<input id="rbdate" type="date" value="${b.baseDate || ''}">`)}
+      ${frow('Km', 'rbkm', inp('rbkm', b.baseKm, car.km || '', 'inputmode="numeric"'))}
+    </div>
+    <div class="group-title">Oppure scadenza fissa</div>
+    <div class="group">${frow('Data', 'rdue', `<input id="rdue" type="date" value="${b.dueDate || ''}">`)}</div>
+    <div class="group-foot">Per tagliando, olio e simili indica data e km dell'ultimo intervento. Per bollo, assicurazione, revisione, patente e gomme stagionali indica la data di scadenza. Se non scrivi nulla, il conteggio parte da oggi.</div>
+    ${r ? `<button class="btn" data-a="remDone" data-id="${r.id}">Segna come fatto</button>
+      <div class="group" style="margin-top:18px"><button class="row tap red" data-a="delRem" data-id="${r.id}">Elimina scadenza</button></div>` : ''}`,
+    onSave: async () => {
+      const type = val('rtype');
+      const everyKm = Math.round(parseNum(val('rkm')) || 0) || null;
+      const everyMonths = Math.round(parseNum(val('rmonths')) || 0) || null;
+      const dueDate = val('rdue') || null;
+      if (!everyKm && !everyMonths && !dueDate) { toast('Indica una ripetizione o una scadenza'); return false; }
+      const baseDate = val('rbdate') || (everyMonths && !dueDate ? today() : null);
+      const baseKm = parseNum(val('rbkm')) ?? (everyKm ? car.km || 0 : null);
+      const rec = { type, title: val('rtitle').trim() || typeOf(type).n, everyKm, everyMonths, baseDate, baseKm, dueDate };
+      if (r) Object.assign(r, rec); else db.reminders.push({ id: uid(), carId: car.id, ...rec });
+      await save(); render(); toast(r ? 'Scadenza aggiornata' : 'Scadenza aggiunta');
+    },
+  });
+  const sel = $('#rtype', $('#overlay'));
+  if (sel && !r) {
+    let prev = sel.value;
+    sel.onchange = () => {
+      const t = TYPE[sel.value], o = $('#overlay');
+      const ti = $('#rtitle', o);
+      if (!ti.value || ti.value === TYPE[prev].n) ti.value = t.n;
+      $('#rkm', o).value = t.km || '';
+      $('#rmonths', o).value = t.mesi || '';
+      if (t.season) $('#rdue', o).value = nextSeason(t); else if (TYPE[prev].season) $('#rdue', o).value = '';
+      prev = sel.value;
+    };
+  }
+}
+
+/* ================= backup ================= */
+async function buildBackup() {
+  const photos = {};
+  const ids = allPhotoIds();
+  for (const id of ids) { const v = await photoURL(id); if (v) photos[id] = v; }
+  const json = JSON.stringify({ app: 'garage-auto', version: 1, exportedAt: new Date().toISOString(), data: db, photos });
+  const name = `igarage-backup-${today()}.json`;
+  return new File([json], name, { type: 'application/json' });
+}
+async function deliverBackup(file) {
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({ files: [file], title: 'Backup iGarage' });
+  } else {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(file); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+  db.settings.lastBackup = new Date().toISOString();
+  await save(); render(); toast('Backup creato');
+}
+let pendingBackup = null;
+async function exportBackup() {
+  if (window.GARAGE_PREVIEW) { toast('Il backup funziona nell\'app installata'); return; }
+  const file = await buildBackup();
+  try { await deliverBackup(file); }
+  catch (e) {
+    if (e && e.name === 'AbortError') return;
+    if (e && e.name === 'NotAllowedError') { // iOS vuole un nuovo tocco per aprire il menu Condividi
+      pendingBackup = file;
+      openSheet({ title: 'Backup pronto', noSave: true, body: `<div class="group-foot" style="margin:8px 4px 16px">Tocca il pulsante e scegli dove salvare il file, per esempio «Salva su File» o iCloud Drive.</div><button class="btn" data-a="shareBackup">Salva il backup</button>` });
+      return;
+    }
+    toast('Esportazione non riuscita');
+  }
+}
+function importBackup() {
+  const i = document.createElement('input');
+  i.type = 'file'; i.accept = 'application/json,.json';
+  i.onchange = async () => {
+    const f = i.files && i.files[0]; if (!f) return;
+    let obj;
+    try { obj = JSON.parse(await f.text()); } catch (e) { toast('File non valido'); return; }
+    if (!obj || obj.app !== 'garage-auto' || !obj.data || !Array.isArray(obj.data.cars)) { toast('Non è un backup di Garage'); return; }
+    const nCars = obj.data.cars.length, nSv = (obj.data.services || []).length;
+    actionSheet(`Il backup contiene ${nCars} ${nCars === 1 ? 'veicolo' : 'veicoli'} e ${nSv} interventi. I dati attuali verranno sostituiti.`, [{
+      label: 'Sostituisci e importa', danger: true,
+      fn: async () => {
+        try {
+          await phClear(); phCache.clear();
+          for (const [id, v] of Object.entries(obj.photos || {})) await phPut(id, v);
+          db = Object.assign(emptyDB(), obj.data); normDB();
+          db.settings = Object.assign(emptyDB().settings, obj.data.settings || {});
+          await save(); S.tab = 'auto'; render(false); toast('Backup importato');
+        } catch (e) { toast('Importazione non riuscita'); }
+      },
+    }]);
+  };
+  i.click();
+}
+
+/* ================= dati di esempio (solo versione di prova) ================= */
+function demoData() {
+  const off = n => addDays(today(), n);
+  const sv = (id, type, title, d, km, cost, shop) => ({ id, carId: 'demo', type, title, date: off(d), km, cost, shop, notes: '', photoIds: [], createdAt: -d });
+  return Object.assign(emptyDB(), {
+    cars: [{ id: 'demo', plate: 'AB123CD', make: 'Fiat', model: 'Panda (esempio)', year: 2018, engine: '1.2 69 CV', fuel: 'Benzina', tyres: 'seasonal', color: '#d70015', body: 'city', vin: '', km: 84200, kmDate: off(-4), photoId: null, createdAt: 1,
+      kmLog: [{ date: off(-820), km: 52000 }, { date: off(-390), km: 69500 }, { date: off(-165), km: 79000 }, { date: off(-4), km: 84200 }] },
+    { id: 'demo2', kind: 'scooter', color: '#5ac8fa', body: 'scooter', plate: 'AB12345', make: 'Piaggio', model: 'Beverly (esempio)', year: 2021, engine: '300 cc', fuel: 'Benzina', vin: '', km: 9800, kmDate: off(-6), photoId: null, createdAt: 2,
+      kmLog: [{ date: off(-300), km: 3200 }, { date: off(-6), km: 9800 }] }],
+    services: [
+      sv('d1', 'tagliando', '', -390, 69500, 220, 'Officina Rossi'), sv('d2', 'gomme', 'Gomme invernali', -375, 70500, 480, 'Gommista Bianchi'),
+      sv('d3', 'bollo', '', -300, null, 185, ''), sv('d4', 'freni', 'Pastiglie anteriori', -165, 79000, 310, 'Officina Rossi'),
+      sv('d5', 'assicurazione', '', -245, null, 540, ''), sv('d6', 'carrozzeria', 'Paraurti posteriore', -820, 52000, 150, 'Carrozzeria Verdi'),
+    ],
+    reminders: [
+      { id: 'r1', carId: 'demo', type: 'tagliando', title: 'Tagliando', everyKm: 15000, everyMonths: 12, baseDate: off(-390), baseKm: 69500, dueDate: null },
+      { id: 'r2', carId: 'demo', type: 'bollo', title: 'Bollo', everyKm: null, everyMonths: 12, baseDate: null, baseKm: null, dueDate: off(21) },
+      { id: 'r3', carId: 'demo', type: 'assicurazione', title: 'Assicurazione', everyKm: null, everyMonths: 12, baseDate: null, baseKm: null, dueDate: off(120) },
+      { id: 'r5', carId: 'demo', type: 'gomme_inv', title: 'Gomme invernali', everyKm: null, everyMonths: 12, baseDate: null, baseKm: null, dueDate: nextSeason(TYPE.gomme_inv) },
+      { id: 'r6', carId: 'demo2', type: 'tagliando', title: 'Tagliando', everyKm: 12000, everyMonths: 12, baseDate: off(-300), baseKm: 3200, dueDate: null },
+      { id: 'r4', carId: 'demo', type: 'revisione', title: 'Revisione', everyKm: null, everyMonths: 24, baseDate: null, baseKm: null, dueDate: off(230) },
+    ],
+    contacts: [
+      { id: 'k1', role: 'assistenza', name: 'ACI Soccorso Stradale', phone: '803 116', notes: '' },
+      { id: 'k2', role: 'officina', name: 'Officina Rossi', phone: '02 1234567', notes: 'Chiuso il lunedì' },
+    ],
+    fines: [{ id: 'f1', carId: 'demo', title: 'Eccesso di velocità', notified: off(-3), amount: 42, due: off(57), paid: false, notes: '', photoIds: [], createdAt: 1 }],
+    quotes: [
+      { id: 'q1', carId: 'demo', company: 'Genertel', price: 480, date: off(-2), notes: '' },
+      { id: 'q2', carId: 'demo', company: 'Linear', price: 455, date: off(-1), notes: 'Franchigia 250 €' },
+    ],
+    docs: [
+      { id: 'o1', carId: 'demo', type: 'libretto', title: '', expires: null, notes: '', photoIds: [], createdAt: 1 },
+      { id: 'o2', carId: 'demo', type: 'assicurazione', title: 'Polizza RCA', expires: off(120), notes: '', photoIds: [], createdAt: 2 },
+      { id: 'o3', carId: 'demo', type: 'patente', title: '', expires: off(18), notes: '', photoIds: [], createdAt: 3 },
+    ],
+    settings: Object.assign(emptyDB().settings, { carId: 'demo', hideInstall: true, theme: (db.settings && db.settings.theme) || 'auto' }),
+  });
+}
+
+/* ================= azioni ================= */
+function deleteCar(id) {
+  const sv = db.services.filter(s => s.carId === id);
+  sv.forEach(s => (s.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }));
+  const c = db.cars.find(x => x.id === id);
+  if (c && c.photoId) { phDel(c.photoId); phCache.delete(c.photoId); }
+  db.docs.filter(s => s.carId === id).forEach(s => (s.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }));
+  db.docs = db.docs.filter(s => s.carId !== id);
+  if (db.checks) delete db.checks[id];
+  db.fines.filter(s => s.carId === id).forEach(s => (s.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }));
+  db.fines = db.fines.filter(s => s.carId !== id);
+  db.quotes = db.quotes.filter(s => s.carId !== id);
+  db.services = db.services.filter(s => s.carId !== id);
+  db.reminders = db.reminders.filter(r => r.carId !== id);
+  db.cars = db.cars.filter(x => x.id !== id);
+  if (db.settings.carId === id) db.settings.carId = db.cars[0] ? db.cars[0].id : null;
+}
+const A = {
+  tab(d) { S.tab = d.t; render(false); },
+  goto(d) { S.tab = d.t; render(false); },
+  addCar() { carSheet(); },
+  setColor(d) { SC = d.v; const s = $('#swatches', $('#overlay')); if (s) s.innerHTML = swatchHTML(); },
+  setAccent(d) { db.settings.accent = d.v; save(); render(); },
+  stepCar(d) { const i = db.cars.findIndex(c => c.id === curCar().id), n = i + (+d.dir); if (n < 0 || n >= db.cars.length) return; S.slide = +d.dir > 0 ? 'r' : 'l'; db.settings.carId = db.cars[n].id; save(); render(false); },
+  setKind(d) {
+    SK = d.v; const o = $('#overlay');
+    const bs = $('#body', o); if (bs) bs.innerHTML = BODIES[SK].map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+    o.querySelectorAll('#kindseg button').forEach(b => b.classList.toggle('on', b.dataset.v === SK));
+    const p = PH[SK];
+    [['plate', 'plate'], ['make', 'make'], ['model', 'model'], ['engine', 'engine']].forEach(([id, k]) => { const e = $('#' + id, o); if (e) e.placeholder = p[k]; });
+    const tr = $('#tyrerow', o), tf = $('#tyrefoot', o); if (tr) tr.hidden = SK === 'scooter'; if (tf) tf.hidden = SK === 'scooter';
+    const f = $('#fuel', o); if (f) { const cur = f.value; f.innerHTML = '<option value="">—</option>' + fuelsFor(SK).map(x => `<option ${x === cur ? 'selected' : ''}>${x}</option>`).join(''); }
+  },
+  hideMs() { const c = curCar(); if (c) { delete c.msNew; save(); render(); } },
+  pickCarId(d) { const i0 = db.cars.findIndex(c => c.id === curCar().id), i1 = db.cars.findIndex(c => c.id === d.id); S.slide = i1 > i0 ? 'r' : i1 < i0 ? 'l' : null; db.settings.carId = d.id; S.tab = 'auto'; save(); render(false); },
+  addContact(d) { contactSheet(null, d.role); },
+  editContact(d) { contactSheet(d.id); },
+  delContact(d) { confirmAct('Eliminare questo contatto?', 'Elimina contatto', async () => { db.contacts = db.contacts.filter(x => x.id !== d.id); closeSheet(true); await save(); render(); toast('Contatto eliminato'); }); },
+  addFine() { if (!curCar()) { carSheet(); return; } fineSheet(null); },
+  editFine(d) { fineSheet(d.id); },
+  delFine(d) { confirmAct('Eliminare questa multa? Le foto allegate verranno eliminate.', 'Elimina multa', async () => { const x = db.fines.find(y => y.id === d.id); if (x) (x.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }); db.fines = db.fines.filter(y => y.id !== d.id); closeSheet(true); await save(); render(); toast('Multa eliminata'); }); },
+  addQuote() { if (!curCar()) { carSheet(); return; } quoteSheet(null); },
+  editQuote(d) { quoteSheet(d.id); },
+  delQuote(d) { confirmAct('Eliminare questo preventivo?', 'Elimina preventivo', async () => { db.quotes = db.quotes.filter(x => x.id !== d.id); closeSheet(true); await save(); render(); toast('Preventivo eliminato'); }); },
+  exportICS() { exportICS(); },
+  shareICS() { const f = pendingICS; if (!f) return; navigator.share({ files: [f], title: 'Scadenze iGarage' }).then(() => closeSheet(true)).catch(e => { if (!e || e.name !== 'AbortError') { dlICS(f); closeSheet(true); } }); },
+  park() { if (!curCar()) { carSheet(); return; } parkSheet(); },
+  parkHere() { parkHere(); },
+  parkClear() { confirmAct('Cancellare il parcheggio salvato?', 'Cancella parcheggio', async () => { delete curCar().park; closeSheet(true); await save(); render(); toast('Parcheggio cancellato'); }); },
+  checks() { if (!curCar()) { carSheet(); return; } CHK_EDIT = false; checkSheet(); },
+  noop() {},
+  toggleCheck(d, el) {
+    const c = checkOf(curCar()); c.done[d.id] = !c.done[d.id];
+    c.at = c.items.some(i => c.done[i.id]) ? new Date().toISOString() : null;
+    const ck = el.querySelector('.chk'); ck.classList.toggle('on', !!c.done[d.id]); if (c.done[d.id]) { ck.classList.remove('pop'); void ck.offsetWidth; ck.classList.add('pop'); }
+    const e = $('#chkcount'); if (e) e.textContent = checkCount(c) + (c.at ? ' · ultimo controllo adesso' : '');
+    save();
+  },
+  addCheck() { const t = val('newchk').trim(); if (!t) { toast('Scrivi il nome della voce'); return; } const c = checkOf(curCar()); c.items.push({ id: uid(), t }); save(); checkSheet(); },
+  delCheck(d) { const c = checkOf(curCar()); c.items = c.items.filter(i => i.id !== d.id); delete c.done[d.id]; save(); checkSheet(); },
+  editChecks() { CHK_EDIT = !CHK_EDIT; checkSheet(); },
+  resetChecks() { const c = checkOf(curCar()); c.done = {}; c.at = null; save(); checkSheet(); },
+  addDoc() { if (!curCar()) { carSheet(); return; } docSheet(null); },
+  editDoc(d) { docSheet(d.id); },
+  delDoc(d) { confirmAct('Eliminare questo documento? Le foto allegate verranno eliminate.', 'Elimina documento', async () => { const x = db.docs.find(y => y.id === d.id); if (x) (x.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }); db.docs = db.docs.filter(y => y.id !== d.id); closeSheet(true); await save(); render(); toast('Documento eliminato'); }); },
+  editCar(d) { carSheet(d.id); },
+  pickCar() { actionSheet('Scegli il veicolo', db.cars.map(c => ({ label: (c.id === curCar().id ? '✓ ' : '') + carName(c), fn: async () => { db.settings.carId = c.id; await save(); render(); } }))); },
+  updateKm() { kmSheet(); },
+  addService() { if (!curCar()) { carSheet(); return; } serviceSheet(null); },
+  editService(d) { serviceSheet(d.id); },
+  addReminder(d) { if (!curCar()) { carSheet(); return; } reminderSheet(null, d.type ? { type: d.type } : {}); },
+  editReminder(d) { reminderSheet(d.id); },
+  remDone(d) { const r = db.reminders.find(x => x.id === d.id); if (!r) return; serviceSheet(null, { type: r.type, title: r.type === 'altro' ? r.title : '', reminderId: r.id }); },
+  delRem(d) { confirmAct('Eliminare questa scadenza?', 'Elimina scadenza', async () => { db.reminders = db.reminders.filter(r => r.id !== d.id); closeSheet(true); await save(); render(); toast('Scadenza eliminata'); }); },
+  delService(d) { confirmAct('Eliminare questo intervento? Le foto allegate verranno eliminate.', 'Elimina intervento', async () => { const s = db.services.find(x => x.id === d.id); if (s) (s.photoIds || []).forEach(p => { phDel(p); phCache.delete(p); }); db.services = db.services.filter(x => x.id !== d.id); if (F) F.added.forEach(p => phDel(p)); closeSheet(true); await save(); render(); toast('Intervento eliminato'); }); },
+  delCar(d) { confirmAct('Eliminare il veicolo con tutti i suoi interventi, scadenze e documenti?', 'Elimina veicolo', async () => { deleteCar(d.id); closeSheet(true); await save(); render(); toast('Auto eliminata'); }); },
+  wipe() { confirmAct('Cancellare tutti i dati? L\'operazione non si può annullare.', 'Cancella tutto', async () => { try { await phClear(); } catch (e) {} phCache.clear(); db = emptyDB(); await save(); S.tab = 'auto'; render(false); toast('Dati cancellati'); }); },
+  filter(d) { S.filter = d.f; render(); },
+  async demo() { db = demoData(); await save(); S.tab = 'auto'; render(false); toast('Dati di esempio caricati'); },
+  setTheme(d) { db.settings.theme = d.v; save(); render(); },
+  hideInstall() { db.settings.hideInstall = true; save(); render(); },
+  export() { exportBackup(); },
+  import() { importBackup(); },
+  shareBackup() { const f = pendingBackup; if (!f) return; deliverBackup(f).then(() => closeSheet(true)).catch(e => { if (!e || e.name !== 'AbortError') toast('Esportazione non riuscita'); }); },
+  viewPhoto(d) { const v = $('#viewer'); v.innerHTML = `<button class="close" data-a="closeViewer" aria-label="Chiudi">✕</button><img alt="">`; v.classList.add('open'); photoURL(d.id).then(u => { if (u) $('img', v).src = u; }); },
+  closeViewer() { const v = $('#viewer'); v.classList.remove('open'); v.innerHTML = ''; },
+  rmPhoto(d) { if (F) { dropPhoto(d.id); drawThumbs(); } },
+  sheetCancel() { if (sheetCtx) closeSheet(false); },
+  async sheetSave() {
+    const c = sheetCtx; if (!c || c.busy) return;
+    c.busy = true;
+    try { const r = await c.onSave(); if (r !== false) closeSheet(true); }
+    catch (e) { console.error(e); toast('Qualcosa è andato storto'); }
+    finally { c.busy = false; }
+  },
+  asPick(d, el) { const it = asItems[+d.i]; closeAS(); if (it && it.fn) setTimeout(it.fn, 60); },
+  asClose() { closeAS(); },
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-a]');
+  if (!el) return;
+  const f = A[el.dataset.a];
+  if (f) f(el.dataset, el);
+});
+let swipe = null;
+document.addEventListener('touchstart', e => { const h = e.target.closest && e.target.closest('.hero'); swipe = h && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null; }, { passive: true });
+document.addEventListener('touchend', e => {
+  if (!swipe || !e.changedTouches.length) return;
+  const dx = e.changedTouches[0].clientX - swipe.x, dy = e.changedTouches[0].clientY - swipe.y; swipe = null;
+  if (Math.abs(dx) > 60 && Math.abs(dy) < 45 && db.cars.length > 1 && S.tab === 'auto') A.stepCar({ dir: dx < 0 ? 1 : -1 });
+}, { passive: true });
+$('#screen').addEventListener('scroll', () => $('#nav').classList.toggle('solid', $('#screen').scrollTop > 38), { passive: true });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !sheetCtx) render(); });
+
+/* ================= avvio ================= */
+(async () => {
+  await load();
+  S.intro = true;
+  render(false);
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    const reg = () => navigator.serviceWorker.register('sw.js').catch(() => {});
+    if (document.readyState === 'complete') reg(); else addEventListener('load', reg);
+  }
+})();
+})();
+</script>
+</body>
+</html>
